@@ -13,7 +13,9 @@ To install and run this application, follow the steps below:
 
 `pip install streamlit boto3`
 
-2. Clone the repository 
+2. Clone the repository or copy the main.py file
+
+Note : Please modify the **code** to suit your specific needs. Clearly specify the **Model ID** that you intend to employ. For reference, during the testing phase of this application, the model **ai21.j2-ultra-v1** was utilized. Additionally, remember to update the region name accordingly
 
 3. Set up AWS credentials
 
@@ -31,12 +33,11 @@ You can start the application by running:
 ## Usage
 To use this application, run the script, navigate to the displayed URL in a web browser, enter a query in the text input, and click 'Submit'. The AI-generated response will be displayed below the 'Submit' button.
 
-Note : 
 
-## The webpage would look like the below :
+## The webpage will appear as shown below. Please note: Your domain or IP address will differ from the example provided.
 
 ![Gen AI Conversations using AWS Bedrock API](GenAIConversationsusingAWSBedrockAPI.jpg)
 
-## Gave the prompt as **Write program to create an EC2 instance using lambda** and below is the response i received.
+## Gave the prompt as "Write program to create an EC2 instance using lambda" and below is the response i received.
 ![Create an EC2 instance using lambda](createec2instanceusinglambda.jpg)
 
