@@ -32,6 +32,7 @@ Replace <filename.py> with the name of the Python file.
 ## Usage
 To use this application, run the script, navigate to the displayed URL in a web browser, enter a query in the text input, and click 'Submit'. The AI-generated response will be displayed below the 'Submit' button.
 
+# The webpage would look like the below :
 
 ![Gen AI Conversations using AWS Bedrock API](GenAIConversationsusingAWSBedrockAPI.jpg)
 
