@@ -13,7 +13,7 @@ To install and run this application, follow the steps below:
 
 2. Install the dependencies
 
-'pip install streamlit boto3'
+`pip install streamlit boto3`
 
 3. Set up AWS credentials
 
@@ -25,7 +25,7 @@ You will be prompted to provide your AWS Access Key ID, Secret Access Key, defau
 4. Run the application
 
 You can start the application by running:
-'streamlit run <filename.py>'
+`streamlit run <filename.py>`
 Replace <filename.py> with the name of the Python file.
 
 ## Usage
