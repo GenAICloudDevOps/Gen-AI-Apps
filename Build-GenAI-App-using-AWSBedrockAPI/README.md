@@ -9,11 +9,11 @@ This script is a Streamlit application that uses the AWS Bedrock API to generate
 ## Installation
 To install and run this application, follow the steps below:
 
-1. Clone the repository
-
-2. Install the dependencies
+1. Install the dependencies
 
 `pip install streamlit boto3`
+
+2. Clone the repository
 
 3. Set up AWS credentials
 
