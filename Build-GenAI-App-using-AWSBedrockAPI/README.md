@@ -18,7 +18,8 @@ To install and run this application, follow the steps below:
 3. Set up AWS credentials
 
 This application requires AWS credentials to access the Bedrock API. Make sure to configure your AWS credentials by running:
-aws configure
+
+`aws configure`
 
 You will be prompted to provide your AWS Access Key ID, Secret Access Key, default region name, and default output format.
 
