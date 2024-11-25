@@ -12,7 +12,8 @@ To install and run this application, follow the steps below:
 
 `pip install streamlit requests`
 
-2. Clone the repository or copy the main.py file
+2. Clone the repository or copy the app.py file
+
 Note: Please modify the **code** to suit your specific needs. Clearly specify the **Mistral API** endpoint and **API Key** that you intend to employ.
 
 3. Set up Mistral API credentials
@@ -20,11 +21,13 @@ Note: Please modify the **code** to suit your specific needs. Clearly specify th
 This application requires Mistral API credentials to access the Mistral API. Make sure to configure your Mistral API key by setting it in the code:
 
 `MISTRAL_API_ENDPOINT = "https://api.mistral.ai/v1/chat/completions"`
+
 `MISTRAL_API_KEY = "your_mistral_api_key"'
 
 4. Run the application
 
 You can start the application by running:
+
 `streamlit run app.py`
 
 ## Usage
