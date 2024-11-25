@@ -1,0 +1,7 @@
+services:
+  mistral-app:
+    build: .  # Build the image from the current directory (.)
+    ports:
+      - "8501:8501"  # Expose port 8501 of the container to port 8501 of the host
+    volumes:
+      - .:/app  # Mount the current directory as /app inside the container (optional for development)
