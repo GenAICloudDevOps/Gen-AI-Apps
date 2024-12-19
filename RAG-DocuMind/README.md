@@ -17,7 +17,7 @@ RAG-DocuMind is a Retrieval-Augmented Generation (RAG) application that combines
 
 ## Installation and Setup
 
-1. Create AWS S3 bucket, IAM Role, Postgres database, EC2 instance and Install Python. Mistral API credentials.
+1. Create AWS S3 bucket, IAM Role, Postgres database, EC2 instance and Install Python. Mistral API credentials. Create manually in AWS console or refer to Cloud Formation template
 2. Clone the repository
 3. Install dependencies:
   `pip install -r requirements.txt`
