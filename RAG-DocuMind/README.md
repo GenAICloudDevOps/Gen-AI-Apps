@@ -1,4 +1,4 @@
-# DocuMind: Intelligent Document Analysis & Response Platform
+# RAG-DocuMind: Intelligent Document Analysis & Response Platform
 
 DocuMind is a Retrieval-Augmented Generation (RAG) application that combines the power of large language models with a custom document repository. It leverages AWS services for document processing, contextual understanding, and intelligent response generation.
 
