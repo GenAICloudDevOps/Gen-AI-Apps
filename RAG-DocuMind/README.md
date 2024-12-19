@@ -64,6 +64,13 @@ MISTRAL_API_KEY = "<YOUR_MISTRAL_API_KEY>"  # Replace with your Mistral API key
 2. Track recent queries and responses.
 
 
+## Important Notices
+
+- **Cost Awareness**: Be mindful of AWS resources, Mistral APIs, and other resources consumption and costs before deployment
+- **Development Purpose**: Not intended for production or commercial use
+- **Security**: Never commit credentials to version control and follow AWS security best practices
+
+
 ## The webpage will appear as shown below. 
 
 
