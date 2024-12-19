@@ -38,14 +38,14 @@ POSTGRES_PASSWORD = "your_database_password"
 
 MISTRAL_API_KEY = "<YOUR_MISTRAL_API_KEY>"  # Replace with your Mistral API key
 ```
-##Usage
+## Usage
 
 1. Run the application;
 `streamlit run app.py`
 
 2. Open the application in your browser
 
-##How it Works:
+## How it Works:
 
 ### Document Processing
 1. Upload PDF, TXT, or DOC files to AWS S3
@@ -67,34 +67,34 @@ MISTRAL_API_KEY = "<YOUR_MISTRAL_API_KEY>"  # Replace with your Mistral API key
 ## The webpage will appear as shown below. 
 
 
-### Streamlit web app initial screen
+### 1. Streamlit web app initial screen
 ![Streamlit web app initial screen](1.jpg)
 
-### Document Processing Screen 
+### 2. Document Processing Screen 
 ![Document Processing](2.jpg)
 
 
-### Document Embedded 
+### 3. Document Embedded 
 ![Document Embedded](3.jpg)
 
 
-### Run Diagnostics 
+### 4. Run Diagnostics 
 ![Run Diagnostics](4.jpg)
 
 
-### Generation settings 
+### 5. Generation settings 
 ![Generation settings](5.jpg)
 
 
-### Query Inteface  
+### 6. Query Inteface  
 ![Query Inteface](6.jpg)
 
 
-### Query Interface showing Final Response
+### 7. Query Interface showing Final Response
 ![Query Interface showing Final Response](7.jpg)
 
-### Analytics
-![Analytics](8 .jpg)
+### 8. Analytics
+![Analytics](8.jpg)
 
 
 
