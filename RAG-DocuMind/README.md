@@ -68,7 +68,7 @@ MISTRAL_API_KEY = "<YOUR_MISTRAL_API_KEY>"  # Replace with your Mistral API key
 
 
 ### 1. Streamlit web app initial screen
-![Streamlit web app initial screen](1.jpg)
+![Streamlit web app initial screen](10.jpg)
 
 ### 2. Document Processing Screen 
 ![Document Processing](2.jpg)
