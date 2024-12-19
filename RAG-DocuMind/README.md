@@ -20,7 +20,7 @@ DocuMind is a Retrieval-Augmented Generation (RAG) application that combines the
 1. Create AWS S3 bucket, IAM Role, Postgres database, EC2 instance and Install Python. Mistral API credentials.
 2. Clone the repository
 3. Install dependencies:
-  `pip install -r requirements.txt'
+  `pip install -r requirements.txt`
 4. Set up environment variables: Create a .env file and populate it with your AWS, PostgreSQL, and Mistral API credentials:
 ```
 S3_BUCKET_NAME = "yourBucketName"  # Replace with your actual S3 bucket name
