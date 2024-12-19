@@ -702,7 +702,7 @@ def main():
     )
 
     # Center-aligned title with smaller size
-    st.markdown("<h2 style='text-align: center;'>DocuMind: Intelligent Document Analysis & Response Platform</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center;'>RAG-DocuMind: Intelligent Document Analysis & Response Platform</h2>", unsafe_allow_html=True)
     
     # Application description
     st.markdown("""
