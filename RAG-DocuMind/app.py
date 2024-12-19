@@ -696,7 +696,7 @@ def main():
 
     # Set page config
     st.set_page_config(
-        page_title="DocuMind: Intelligent Document Analysis & Response Platform",
+        page_title="RAG-DocuMind: Intelligent Document Analysis & Response Platform",
         layout="wide",
         initial_sidebar_state="expanded"
     )
@@ -724,7 +724,7 @@ def main():
                 <li><strong>Enterprise-Ready Infrastructure:</strong> Built on AWS services for scalability, security, and reliability</li>
                 <li><strong>Interactive Query System:</strong> Get context-aware responses powered by Mistral's language models (open-mistral-7b, mistral-small-latest, codestral-latest)</li>
                 <li><strong>Real-time Diagnostics:</strong> Monitor system health and processing status with built-in diagnostic tools</li>
-                <li><strong>Customizable Response Generation:</strong> Fine-tune output with adjustable temperature and token controls</li>
+                <li><strong>Customizable Response Generation:</strong> Adjust model responses with customizable temperature and token limits</li>
             </ul>
         </div>
     """, unsafe_allow_html=True)
