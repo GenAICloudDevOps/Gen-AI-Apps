@@ -5,7 +5,7 @@ DocuMind is a Retrieval-Augmented Generation (RAG) application that combines the
 ## Key Features
 - **Universal Document Support**: Process and analyze PDF, TXT, and DOC/DOCX files with automated content extraction.
 - **Dual Intelligence Systems**:
-  - Lightweight **TF-IDF** vectorization for local analysis.
+  - Lightweight **TF-IDF** vectorization.
   - **Mistral's embedding model** for advanced contextual understanding.
 - **Smart Content Processing**: Choose between:
   - Fixed-size chunking with overlap.
