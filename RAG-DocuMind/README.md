@@ -13,7 +13,7 @@ DocuMind is a Retrieval-Augmented Generation (RAG) application that combines the
 - **Enterprise-Ready Infrastructure**: Scalable, secure, and reliable, built on AWS services.
 - **Interactive Query System**: Context-aware query responses using Mistral models like `open-mistral-7b` and `mistral-small-latest`.
 - **Real-time Diagnostics**: Built-in tools to monitor system health and processing status.
-- **Customizable Response Generation**: Fine-tune model responses with adjustable temperature and token limits.
+- **Customizable Response Generation**: Adjust model responses with customizable temperature and token limits.
 
 ## Installation and Setup
 
