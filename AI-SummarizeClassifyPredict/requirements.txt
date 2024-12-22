@@ -1,0 +1,13 @@
+streamlit
+boto3
+psycopg2-binary
+requests
+numpy
+scikit-learn
+PyPDF2
+python-dotenv
+plotly
+pandas
+python-docx
+uuid
+python-docx==0.8.11
