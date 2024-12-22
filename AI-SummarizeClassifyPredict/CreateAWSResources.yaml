@@ -1,0 +1,366 @@
+# =============================================================================
+# AWS CloudFormation Template Documentation
+# =============================================================================
+# Purpose: Creates a complete infrastructure stack for a web application including:
+#   - VPC with public and private subnets
+#   - EC2 instance for application hosting
+#   - RDS PostgreSQL database
+#   - S3 bucket for file storage
+#   - IAM user with necessary permissions
+#
+# Architecture:
+# -------------
+# 1. Networking:
+#    - VPC with CIDR 10.0.0.0/16
+#    - Public subnet (10.0.1.0/24) for EC2
+#    - Two private subnets (10.0.2.0/24, 10.0.3.0/24) for RDS
+#    - NAT Gateway for private subnet internet access
+#
+# 2. Security:
+#    - EC2 Security Group:
+#      * SSH (22)
+#      * HTTP (80)
+#      * HTTPS (443)
+#      * Streamlit (8501-8510)
+#    - RDS Security Group:
+#      * PostgreSQL (5432) from EC2 only
+#
+# 3. Components:
+#    - EC2: t3.medium instance (configurable)
+#    - RDS: PostgreSQL 16.1 on db.t4g.micro
+#    - S3: Versioned bucket with encryption
+#
+# Usage:
+# ------
+# Required Parameters:
+#   - EnvironmentName: Prefix for resource names (default: dev)
+#   - KeyPairName: EC2 SSH key pair name
+#   - EC2InstanceType: Instance size
+#   - DBName: Database name
+#
+# Deployment Methods:
+# ------------------
+# 1. AWS Console Deployment:
+#    a. Navigate to AWS CloudFormation console
+#    b. Click "Create stack" > "With new resources (standard)"
+#    c. Choose "Upload a template file"
+#    d. Upload this YAML file
+#    e. Click "Next"
+#    f. Enter stack details:
+#       - Stack name: <your-stack-name>
+#       - EnvironmentName: dev (or your preference)
+#       - KeyPairName: Select your existing key pair
+#       - EC2InstanceType: Choose instance size (default: t3.medium)
+#       - DBName: Enter database name (default: mydb)
+#    g. Click "Next" twice (keep default options)
+#    h. Review and check acknowledgments
+#    i. Click "Create stack"
+#    j. Wait for stack creation (~15-20 minutes)
+#
+# 2. AWS CLI Deployment:
+# aws cloudformation create-stack \
+#   --stack-name <stack-name> \
+#   --template-body file://createec2s3postgres_new.yaml \
+#   --parameters \
+#     ParameterKey=EnvironmentName,ParameterValue=dev \
+#     ParameterKey=KeyPairName,ParameterValue=dev-key-pair
+#
+# Post-Deployment Steps:
+# ---------------------
+# 1. Get EC2 Public IP from Outputs tab
+# 2. Connect via SSH: ssh -i "your-key.pem" ec2-user@<EC2-Public-IP>
+#
+# Important Notes:
+# ---------------
+# 1. Create EC2 key pair before deploying
+# 2. Default database credentials should be changed after deployment
+# 3. S3 bucket name must be globally unique
+# 4. All resources are created in the same region
+# =============================================================================
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation template for creating IAM user, EC2 instance, S3 bucket, and RDS PostgreSQL database'
+
+Parameters:
+  EnvironmentName:
+    Description: Environment name
+    Type: String
+    Default: dev
+
+  EC2InstanceType:
+    Type: String
+    Default: t3.medium
+    AllowedValues: 
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+    Description: EC2 instance type
+
+  DBName:
+    Type: String
+    Description: Database name
+    Default: mydb
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC to use for resources
+
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Default: dev-key-pair
+
+Resources:
+  # VPC and Network Configuration
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-vpc
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-public-subnet-1
+
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: us-east-1a
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-private-subnet-1
+
+  # Add second private subnet
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone: us-east-1b
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-private-subnet-2
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref InternetGateway
+
+  # Route Tables and Routing Configuration
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-public-rt
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PublicSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+
+  NatGatewayEIP:
+    Type: AWS::EC2::EIP
+    DependsOn: AttachGateway
+    Properties:
+      Domain: vpc
+
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGatewayEIP.AllocationId
+      SubnetId: !Ref PublicSubnet1
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-nat
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-private-rt
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway
+
+  PrivateSubnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateRouteTable
+
+  PrivateSubnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateRouteTable
+
+  # IAM User with specific permissions
+  EC2AdminUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: ec2-user
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AmazonRDSFullAccess
+
+  # S3 Bucket with improved security
+  MyS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${EnvironmentName}-${AWS::AccountId}-${AWS::Region}-bucket'
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  # EC2 Security Group with restricted access
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref MyVPC
+      GroupName: !Sub ${EnvironmentName}-ec2-sg
+      GroupDescription: Security group for EC2 instance
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8501
+          ToPort: 8510
+          CidrIp: 0.0.0.0/0
+
+  # RDS Security Group
+  RDSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref MyVPC
+      GroupName: !Sub ${EnvironmentName}-rds-sg
+      GroupDescription: Security group for RDS PostgreSQL
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref EC2SecurityGroup
+
+  # EC2 Instance
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-01816d07b1128cd2d
+      InstanceType: !Ref EC2InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref PublicSubnet1
+      SecurityGroupIds: 
+        - !Ref EC2SecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-ec2
+
+  # RDS Subnet Group
+  RDSSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for RDS
+      SubnetIds:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+
+  # RDS PostgreSQL Database
+  PostgreSQLDatabase:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Sub ${EnvironmentName}-postgres
+      Engine: postgres
+      EngineVersion: '16.1'
+      MasterUsername: postgres
+      MasterUserPassword: postgres
+      DBInstanceClass: db.t4g.micro
+      StorageType: gp2
+      AllocatedStorage: 30
+      VPCSecurityGroups:
+        - !Ref RDSSecurityGroup
+      DBSubnetGroupName: !Ref RDSSubnetGroup
+      PubliclyAccessible: false
+      DBName: !Ref DBName
+      BackupRetentionPeriod: 0
+      MonitoringInterval: 0
+      EnablePerformanceInsights: false
+      MultiAZ: false
+      StorageEncrypted: true
+
+Outputs:
+  VPCId:
+    Description: VPC ID
+    Value: !Ref MyVPC
+
+  IAMUserName:
+    Description: Name of the IAM user created
+    Value: !Ref EC2AdminUser
+
+  EC2InstanceId:
+    Description: ID of the EC2 instance
+    Value: !Ref MyEC2Instance
+
+  S3BucketName:
+    Description: Name of the S3 bucket
+    Value: !Ref MyS3Bucket
+
+  DatabaseEndpoint:
+    Description: Endpoint of the PostgreSQL database
+    Value: !GetAtt PostgreSQLDatabase.Endpoint.Address
+
+  KeyPairName:
+    Description: Name of the key pair
+    Value: !Ref KeyPairName
