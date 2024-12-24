@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 # Configuration from environment variables
 S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
-S3_DOCUMENT_KEY = os.getenv('S3_DOCUMENT_KEY', '')
+S3_FOLDER_NAME = os.getenv('S3_FOLDER_APP1', 'App1_RAG-DocuMind/')
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
 AWS_REGION = os.getenv('AWS_REGION')
@@ -525,14 +525,21 @@ def diagnose_document_processing(vectorizer_type):
     with st.expander("Diagnostics Results", expanded=True):
         st.write("Running diagnostics...")
         
-        # Check S3 connection
+        # Check S3 connection and folder contents
         try:
-            response = s3_client.list_objects_v2(Bucket=S3_BUCKET_NAME, Prefix=S3_DOCUMENT_KEY)
+            response = s3_client.list_objects_v2(
+                Bucket=S3_BUCKET_NAME,
+                Prefix=S3_FOLDER_NAME
+            )
             st.write("✅ S3 connection successful")
-            if 'Contents' in response:
-                st.write(f"Found {len(response['Contents'])} objects with prefix {S3_DOCUMENT_KEY}")
+            folder_files = [
+                obj['Key'] for obj in response.get('Contents', [])
+                if obj['Key'].startswith(S3_FOLDER_NAME)
+            ]
+            if folder_files:
+                st.write(f"Found {len(folder_files)} objects in folder {S3_FOLDER_NAME}")
             else:
-                st.warning(f"No objects found with prefix {S3_DOCUMENT_KEY}")
+                st.warning(f"No objects found in folder {S3_FOLDER_NAME}")
         except Exception as e:
             st.error(f"S3 connection failed: {str(e)}")
         
@@ -596,8 +603,25 @@ def visualize_embeddings(embeddings, labels=None):
                     title='Document Embeddings Visualization')
     return fig
 
+def get_s3_files():
+    """Get list of files from S3 bucket's App1 folder"""
+    try:
+        response = s3_client.list_objects_v2(
+            Bucket=S3_BUCKET_NAME,
+            Prefix=S3_FOLDER_NAME
+        )
+        files = []
+        for obj in response.get('Contents', []):
+            if obj['Key'].startswith(S3_FOLDER_NAME) and obj['Key'].lower().endswith(('.pdf', '.txt', '.doc', '.docx')):
+                # Remove prefix for display
+                files.append(obj['Key'])
+        return files
+    except Exception as e:
+        st.error(f"Error accessing S3: {str(e)}")
+        return []
+
 def file_uploader_ui():
-    """Handle file uploads with progress tracking and validation"""
+    """Handle file uploads with S3 folder structure"""
     MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB limit
     ALLOWED_TYPES = {
         'pdf': 'application/pdf',
@@ -645,8 +669,8 @@ def file_uploader_ui():
                 
                 file.seek(0)
                 
-                # Upload directly to bucket root
-                s3_key = file.name
+                # Update S3 key to include folder
+                s3_key = f"{S3_FOLDER_NAME}{file.name}"
                 
                 try:
                     s3_client.upload_fileobj(
@@ -792,13 +816,17 @@ def main():
                 with progress_container:
                     with st.spinner("Processing documents..."):
                         try:
-                            # List all objects in S3 bucket root
-                            objects = s3_client.list_objects_v2(Bucket=S3_BUCKET_NAME)
+                            # List objects in specific S3 folder
+                            objects = s3_client.list_objects_v2(
+                                Bucket=S3_BUCKET_NAME,
+                                Prefix=S3_FOLDER_NAME
+                            )
                             
-                            # Filter for supported document types
+                            # Filter for supported document types in the correct folder
                             supported_files = [
                                 obj for obj in objects.get('Contents', [])
-                                if obj['Key'].lower().endswith(('.pdf', '.txt', '.doc', '.docx'))
+                                if obj['Key'].startswith(S3_FOLDER_NAME) and 
+                                obj['Key'].lower().endswith(('.pdf', '.txt', '.doc', '.docx'))
                             ]
                             
                             total_docs = len(supported_files)

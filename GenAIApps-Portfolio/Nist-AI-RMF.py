@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 # AWS and API Configuration
 S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+S3_FOLDER_NAME = os.getenv('S3_FOLDER_APP3', 'App3_Nist-AI-RMF/')
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
 AWS_REGION = os.getenv('AWS_REGION')
@@ -32,10 +33,14 @@ s3_client = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY,
                         region_name=AWS_REGION)
 
 def get_s3_files():
-    """Get list of files from S3 bucket"""
+    """Get list of files from S3 bucket's App3 folder"""
     try:
-        response = s3_client.list_objects_v2(Bucket=S3_BUCKET_NAME)
-        return [obj['Key'] for obj in response.get('Contents', [])]
+        response = s3_client.list_objects_v2(
+            Bucket=S3_BUCKET_NAME,
+            Prefix=S3_FOLDER_NAME
+        )
+        return [obj['Key'] for obj in response.get('Contents', [])
+                if obj['Key'].lower().endswith(('.pdf', '.txt', '.doc', '.docx'))]
     except Exception as e:
         st.error(f"Error accessing S3: {str(e)}")
         return []

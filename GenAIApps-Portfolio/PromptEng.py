@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 # Configuration from environment variables
 S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
-S3_DOCUMENT_KEY = os.getenv('S3_DOCUMENT_KEY', '')
+S3_FOLDER_NAME = os.getenv('S3_FOLDER_APP2', 'App2_PromptEng/')
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
 AWS_REGION = os.getenv('AWS_REGION')
@@ -552,14 +552,21 @@ def diagnose_document_processing(vectorizer_type):
     with st.expander("Diagnostics Results", expanded=True):
         st.write("Running diagnostics...")
         
-        # Check S3 connection
+        # Check S3 connection and folder contents
         try:
-            response = s3_client.list_objects_v2(Bucket=S3_BUCKET_NAME, Prefix=S3_DOCUMENT_KEY)
+            response = s3_client.list_objects_v2(
+                Bucket=S3_BUCKET_NAME,
+                Prefix=S3_FOLDER_NAME
+            )
             st.write("✅ S3 connection successful")
-            if 'Contents' in response:
-                st.write(f"Found {len(response['Contents'])} objects with prefix {S3_DOCUMENT_KEY}")
+            folder_files = [
+                obj['Key'] for obj in response.get('Contents', [])
+                if obj['Key'].startswith(S3_FOLDER_NAME)
+            ]
+            if folder_files:
+                st.write(f"Found {len(folder_files)} objects in folder {S3_FOLDER_NAME}")
             else:
-                st.warning(f"No objects found with prefix {S3_DOCUMENT_KEY}")
+                st.warning(f"No objects found in folder {S3_FOLDER_NAME}")
         except Exception as e:
             st.error(f"S3 connection failed: {str(e)}")
         
@@ -702,7 +709,7 @@ def file_uploader_ui():
                 file.seek(0)
                 
                 # Upload directly to bucket root
-                s3_key = file.name
+                s3_key = f"{S3_FOLDER_NAME}{file.name}"
                 
                 try:
                     s3_client.upload_fileobj(
@@ -859,8 +866,11 @@ def main():
                     s3_files,
                     help="Choose documents from S3 bucket"
                 )
+                if not state['selected_s3_files']:
+                    st.info("Please select at least one document")
             else:
-                st.warning("No documents found in S3 bucket")
+                st.warning(f"No documents found in folder {S3_FOLDER_NAME}")
+                st.info("Upload documents first or choose a different input source")
         
         if state['input_source'] == "Direct Text Input":
             state['user_text'] = st.text_area(
@@ -925,22 +935,35 @@ def main():
 # ...rest of the existing code...
 
 def get_s3_files():
-    """Get list of files from S3 bucket"""
+    """Get list of files from S3 bucket's App2 folder"""
     try:
-        response = s3_client.list_objects_v2(Bucket=S3_BUCKET_NAME)
-        return [obj['Key'] for obj in response.get('Contents', [])
-                if obj['Key'].lower().endswith(('.pdf', '.txt', '.doc', '.docx'))]
+        response = s3_client.list_objects_v2(
+            Bucket=S3_BUCKET_NAME,
+            Prefix=S3_FOLDER_NAME
+        )
+        files = []
+        for obj in response.get('Contents', []):
+            if obj['Key'].startswith(S3_FOLDER_NAME) and obj['Key'].lower().endswith(('.pdf', '.txt', '.doc', '.docx')):
+                files.append(obj['Key'])
+        logger.info(f"Found {len(files)} files in {S3_FOLDER_NAME}")
+        return files
     except Exception as e:
-        st.error(f"Error accessing S3: {str(e)}")
+        logger.error(f"Error accessing S3: {str(e)}")
         return []
 
 def process_documents(input_source, s3_files=None, vectorizer_type="Mistral-Embed", chunking_strategy="Sentence-Based", additional_context=None):
     """Process documents from various sources"""
     try:
-        if not s3_files and input_source in ["S3 Documents", "Both"]:
-            st.error("Please select at least one document to process")
-            return False
-            
+        if input_source in ["S3 Documents", "Both"]:
+            if not s3_files:
+                st.error("Please select at least one document to process")
+                return False
+                
+            # Verify all files are from correct folder
+            if not all(file.startswith(S3_FOLDER_NAME) for file in s3_files):
+                st.error(f"Some selected files are not from the {S3_FOLDER_NAME} folder")
+                return False
+        
         all_chunks = []
         processed_files = []
         
