@@ -11,3 +11,4 @@ pandas
 python-docx
 uuid
 python-docx==0.8.11
+crewai

@@ -89,6 +89,14 @@ From React App you can launch other apps or directly go to other Apps.
 1. Select Document and click Process
 2. Input a question and get a response
 
+### App4 Multi-Agent Collaboration using CrewAI
+
+#### Unlock the power of collaborative AI with the innovative Streamlit application. Define two AI agents—each with unique roles and expertise—to work in tandem: one agent dives deep into research, while the other crafts a polished, insightful report based on the findings. 
+
+1. Input Topic, Choose Model
+2. Define Agents Role, Goal, Backstory and Task Description
+3. Click Generate 
+
 ## Important Notices
 
 - **Cost Awareness**: Be mindful of AWS resources, Mistral APIs, and other resources consumption and costs before deployment
@@ -119,6 +127,10 @@ From React App you can launch other apps or directly go to other Apps.
 
 ### 6. App in Action  
 ![App in Action](Screenshots/2.2.jpg)
+
+### 7. App4: Multi-AgentCollaboration using CrewAI 
+![App4: Multi-AgentCollaboration using CrewAI ](Screenshots/5.jpg)
+
 
 
 

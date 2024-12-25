@@ -5,8 +5,8 @@ const EC2_PUBLIC_IP = '18.212.36.74';
 // Common styles for reusability and consistency
 const cardStyles = {
   background: 'rgba(255, 255, 255, 0.05)',
-  borderRadius: '1rem',
-  padding: '2rem',
+  borderRadius: '0.75rem',  // Reduced from 1rem
+  padding: '1.25rem',       // Reduced from 2rem
   backdropFilter: 'blur(10px)',
   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
   transition: 'transform 0.2s, box-shadow 0.2s',
@@ -17,23 +17,23 @@ const cardStyles = {
 };
 
 const titleStyles = {
-  fontSize: '2rem',
-  marginBottom: '1rem',
+  fontSize: '1.5rem',      // Reduced from 2rem
+  marginBottom: '0.5rem',  // Reduced from 1rem
   textAlign: 'center',
   color: 'white',
   fontWeight: 'bold',
-  height: '60px',
+  height: '40px',         // Reduced from 60px
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center'
 };
 
 const subtitleStyles = {
-  fontSize: '1.25rem',
+  fontSize: '1.1rem',      // Reduced from 1.25rem
   color: '#a7f3d0',
-  marginBottom: '1.5rem',
+  marginBottom: '1rem',    // Reduced from 1.5rem
   textAlign: 'center',
-  height: '50px',
+  height: '35px',         // Reduced from 50px
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center'
@@ -41,43 +41,43 @@ const subtitleStyles = {
 
 const descriptionStyles = {
   color: '#d1fae5',
-  marginBottom: '2rem',
-  lineHeight: '1.6',
+  marginBottom: '1rem',    // Reduced from 2rem
+  lineHeight: '1.4',       // Reduced from 1.6
   flexGrow: 1,
-  fontSize: '1.1rem',
-  textAlign: 'center', // Added center alignment
-  padding: '0 1rem' // Added padding for better readability
+  fontSize: '1rem',        // Reduced from 1.1rem
+  textAlign: 'center',
+  padding: '0 0.5rem'      // Reduced from 1rem
 };
 
 const buttonStyles = {
-  background: '#4ade80', // Light green color
-  color: '#064e3b', // Dark green text for contrast
-  padding: '0.75rem 2rem',
+  background: '#4ade80',
+  color: '#064e3b',
+  padding: '0.5rem 1.5rem', // Reduced padding
   borderRadius: '9999px',
   fontWeight: 'bold',
   border: 'none',
   cursor: 'pointer',
   transition: 'all 0.2s',
-  fontSize: '1.1rem'
+  fontSize: '1rem'          // Reduced from 1.1rem
 };
 
 const App = () => {
   return (
     <div style={{ backgroundColor: '#111827', minHeight: '100vh', color: 'white' }}>
-      {/* Header with reduced bottom padding */}
-      <div style={{ textAlign: 'center', padding: '3rem 2rem 1.5rem' }}> {/* Reduced padding */}
-        <h1 style={{ fontSize: '3.5rem', marginBottom: '0.75rem', color: 'white' }}> {/* Reduced margin */}
+      {/* Header with minimal padding */}
+      <div style={{ textAlign: 'center', padding: '1.5rem 2rem 1rem' }}>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', color: 'white' }}>
           GenAI Apps - Portfolio
         </h1>
-        <p style={{ fontSize: '1.5rem', color: '#a7f3d0', marginBottom: '1rem' }}> {/* Reduced margin */}
+        <p style={{ fontSize: '1.25rem', color: '#a7f3d0', marginBottom: '0.5rem' }}>
           Welcome to my GenAI Apps
         </p>
         <p style={{ 
-          fontSize: '1.1rem', 
+          fontSize: '1rem', 
           color: '#a7f3d0', 
           maxWidth: '800px', 
-          margin: '0 auto 2rem', // Reduced bottom margin from 3rem to 2rem
-          lineHeight: '1.6'
+          margin: '0 auto 1rem',
+          lineHeight: '1.4'
         }}>
           Supports various document types, offers lightweight TF-IDF or Mistral's embedding for analysis, 
           uses advanced chunking strategies, runs on AWS for reliability, provides context-aware responses, 
@@ -85,14 +85,14 @@ const App = () => {
         </p>
       </div>
 
-      {/* Three Column Layout - Moved closer to header */}
+      {/* Two Column Layout with optimized spacing */}
       <div style={{ 
         maxWidth: '1400px',
         margin: '0 auto', 
         padding: '0 2rem',
         display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '2rem'
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: '1.5rem'      // Reduced from 2rem
       }}>
         {/* First App */}
         <div style={cardStyles}>
@@ -135,10 +135,24 @@ const App = () => {
             </div>
           </a>
         </div>
+
+        {/* Fourth App */}
+        <div style={cardStyles}>
+          <a href={`http://${EC2_PUBLIC_IP}:8504`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <h2 style={titleStyles}>Multi-Agent Collaboration using CrewAI</h2>
+            <h3 style={subtitleStyles}>Power of Collaborative AI</h3>
+            <p style={descriptionStyles}>
+              Define agents Roles and Expertise to work in tandem
+            </p>
+            <div style={{ textAlign: 'center' }}>
+              <button style={buttonStyles}>Launch App →</button>
+            </div>
+          </a>
+        </div>
       </div>
 
-      {/* Footer */}
-      <footer style={{ textAlign: 'center', padding: '2rem', color: '#9CA3AF', marginTop: '4rem' }}>
+      {/* Footer with minimal padding */}
+      <footer style={{ textAlign: 'center', padding: '1rem', color: '#9CA3AF', marginTop: '1rem' }}>
         <p>© 2024 GenAI Apps Portfolio. All rights reserved.</p>
       </footer>
     </div>
