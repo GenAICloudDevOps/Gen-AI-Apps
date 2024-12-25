@@ -23,6 +23,8 @@ MISTRAL_API_KEY = "<YOUR_MISTRAL_API_KEY>"  # Replace with your Mistral API key
 
 2. Open the application in your browser
 
+`Http://PublicIP:8501`
+
 ## How it Works:
 
 1. Input a Topic and choose a Model 
