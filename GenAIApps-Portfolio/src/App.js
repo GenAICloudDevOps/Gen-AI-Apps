@@ -1,6 +1,6 @@
 import React from 'react';
 
-const EC2_PUBLIC_IP = '18.212.36.74';
+const EC2_PUBLIC_IP = '54.158.93.206';
 
 // Common styles for reusability and consistency
 const cardStyles = {
@@ -85,69 +85,100 @@ const App = () => {
         </p>
       </div>
 
-      {/* Two Column Layout with optimized spacing */}
+      {/* Three-Two Row Layout with optimized spacing */}
       <div style={{ 
         maxWidth: '1400px',
         margin: '0 auto', 
         padding: '0 2rem',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(2, 1fr)',
-        gap: '1.5rem'      // Reduced from 2rem
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1.5rem'
       }}>
-        {/* First App */}
-        <div style={cardStyles}>
-          <a href={`http://${EC2_PUBLIC_IP}:8501`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <h2 style={titleStyles}>RAG-DocuMind</h2>
-            <h3 style={subtitleStyles}>Intelligent Document Analysis & Response Platform</h3>
-            <p style={descriptionStyles}>
-              A Retrieval-Augmented Generation (RAG) application leveraging AWS services for document processing and analysis.
-            </p>
-            <div style={{ textAlign: 'center' }}>
-              <button style={buttonStyles}>Launch App →</button>
-            </div>
-          </a>
+        {/* First Row - Three Apps */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '1.5rem'
+        }}>
+          {/* First App */}
+          <div style={cardStyles}>
+            <a href={`http://${EC2_PUBLIC_IP}:8501`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <h2 style={titleStyles}>RAG-DocuMind</h2>
+              <h3 style={subtitleStyles}>Intelligent Document Analysis & Response Platform</h3>
+              <p style={descriptionStyles}>
+                A Retrieval-Augmented Generation (RAG) application leveraging AWS services for document processing and analysis.
+              </p>
+              <div style={{ textAlign: 'center' }}>
+                <button style={buttonStyles}>Launch App →</button>
+              </div>
+            </a>
+          </div>
+
+          {/* Second App */}
+          <div style={cardStyles}>
+            <a href={`http://${EC2_PUBLIC_IP}:8502`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <h2 style={titleStyles}>Prompt Engineering</h2>
+              <h3 style={subtitleStyles}>Summarize, Classify, Predict</h3>
+              <p style={descriptionStyles}>
+                A Retrieval-Augmented Generation (RAG) application using Streamlit and AWS allows users to summarize key information.
+              </p>
+              <div style={{ textAlign: 'center' }}>
+                <button style={buttonStyles}>Launch App →</button>
+              </div>
+            </a>
+          </div>
+
+          {/* Third App */}
+          <div style={cardStyles}>
+            <a href={`http://${EC2_PUBLIC_IP}:8503`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <h2 style={titleStyles}>NIST AI RMF</h2>
+              <h3 style={subtitleStyles}>Generative Artificial Intelligence Profile</h3>
+              <p style={descriptionStyles}>
+                A Companion Resource for Implementing the AI RMF in Generative AI Systems.
+              </p>
+              <div style={{ textAlign: 'center' }}>
+                <button style={buttonStyles}>Launch App →</button>
+              </div>
+            </a>
+          </div>
         </div>
 
-        {/* Second App */}
-        <div style={cardStyles}>
-          <a href={`http://${EC2_PUBLIC_IP}:8502`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <h2 style={titleStyles}>Prompt Engineering</h2>
-            <h3 style={subtitleStyles}>Summarize, Classify, Predict</h3>
-            <p style={descriptionStyles}>
-              A Retrieval-Augmented Generation (RAG) application using Streamlit and AWS allows users to summarize key information.
-            </p>
-            <div style={{ textAlign: 'center' }}>
-              <button style={buttonStyles}>Launch App →</button>
-            </div>
-          </a>
-        </div>
+        {/* Second Row - Two Apps */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '1.5rem',
+          maxWidth: '1000px',  // Slightly narrower to maintain visual balance
+          margin: '0 auto',    // Center the second row
+          width: '100%'
+        }}>
+          {/* Fourth App */}
+          <div style={cardStyles}>
+            <a href={`http://${EC2_PUBLIC_IP}:8504`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <h2 style={titleStyles}>Multi-Agent Collaboration using CrewAI</h2>
+              <h3 style={subtitleStyles}>Power of Collaborative AI</h3>
+              <p style={descriptionStyles}>
+                Define agents Roles and Expertise to work in tandem
+              </p>
+              <div style={{ textAlign: 'center' }}>
+                <button style={buttonStyles}>Launch App →</button>
+              </div>
+            </a>
+          </div>
 
-        {/* Third App */}
-        <div style={cardStyles}>
-          <a href={`http://${EC2_PUBLIC_IP}:8503`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <h2 style={titleStyles}>NIST AI RMF</h2>
-            <h3 style={subtitleStyles}>Generative Artificial Intelligence Profile</h3>
-            <p style={descriptionStyles}>
-              A Companion Resource for Implementing the AI RMF in Generative AI Systems.
-            </p>
-            <div style={{ textAlign: 'center' }}>
-              <button style={buttonStyles}>Launch App →</button>
-            </div>
-          </a>
-        </div>
-
-        {/* Fourth App */}
-        <div style={cardStyles}>
-          <a href={`http://${EC2_PUBLIC_IP}:8504`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <h2 style={titleStyles}>Multi-Agent Collaboration using CrewAI</h2>
-            <h3 style={subtitleStyles}>Power of Collaborative AI</h3>
-            <p style={descriptionStyles}>
-              Define agents Roles and Expertise to work in tandem
-            </p>
-            <div style={{ textAlign: 'center' }}>
-              <button style={buttonStyles}>Launch App →</button>
-            </div>
-          </a>
+          {/* Fifth App */}
+          <div style={cardStyles}>  {/* Fixed: Removed extra closing tag */}
+            <a href={`http://${EC2_PUBLIC_IP}:8505`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <h2 style={titleStyles}>Conversational AI Assistant</h2>
+              <h3 style={subtitleStyles}>Powered by Chainlit</h3>
+              <p style={descriptionStyles}>
+                User-friendly interface for building and deploying powerful conversational AI
+              </p>
+              <div style={{ textAlign: 'center' }}>
+                <button style={buttonStyles}>Launch App →</button>
+              </div>
+            </a>
+          </div>
         </div>
       </div>
 

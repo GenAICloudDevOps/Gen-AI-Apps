@@ -131,6 +131,9 @@ From React App you can launch other apps or directly go to other Apps.
 ### 7. App4: Multi-AgentCollaboration using CrewAI 
 ![App4: Multi-AgentCollaboration using CrewAI ](Screenshots/5.jpg)
 
+### 8. App5: Conversational AI Assistant using Chainlit
+![App5: Conversational AI Assistant using Chainlit](Screenshots/6.jpg)
+
 
 
 
