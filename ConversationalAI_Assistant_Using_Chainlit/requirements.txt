@@ -1,0 +1,22 @@
+# Core dependencies
+chainlit==0.7.700
+pydantic==1.10.12
+aiohttp>=3.8.0
+python-dotenv>=0.19.0
+
+# API and async handling
+requests>=2.28.0
+asyncio>=3.4.3
+
+# Utility packages
+python-dateutil>=2.8.2
+typing-extensions>=4.0.0
+
+# Optional - for file handling
+PyPDF2>=3.0.0
+python-docx==0.8.11
+
+# Development and debugging
+pytest>=7.0.0
+black>=22.0.0
+
