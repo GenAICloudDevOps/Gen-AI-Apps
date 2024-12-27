@@ -53,9 +53,12 @@ MISTRAL_API_KEY="<YOUR_MISTRAL_API_KEY>"  # Replace with your Mistral API key
 
 2. Open the application in your browser
 - **React App**: http://publicIP:3000 
-- **Streamlit App RAG-DocuMind**: http://publicIP:8501
-- **Streamlit App PromptEng**: http://publicIP:8502
-- **Streamlit App Mist-AI-RMF**: http://publicIP:8503
+- **RAG-DocuMind**: http://publicIP:8501
+- **Prompt Engineering**: http://publicIP:8502
+- **Nist-AI-RMF**: http://publicIP:8503
+- **Multi-Agent Collaboration using CrewAI**: http://publicIP:8504
+- **Conversational AI Assistant**: http://publicIP:8505
+- **Interpretable Explainable AI**: http://publicIP:8506
 
 
 
@@ -140,7 +143,6 @@ From React App you can launch other apps or directly go to other Apps.
 
 ### 4. App3: Nist-AI-RMF 
 ![App3: Nist-AI-RMF ](Screenshots/4.jpg)
-
 
 ### 5. App in Action  
 ![App in Action](Screenshots/2.1.jpg)
