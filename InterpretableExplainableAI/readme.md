@@ -1,4 +1,4 @@
-# Interpretable and Explainable AI: Customer Churn Analysis
+# Interpretable and Explainable AI
 
 An interactive web application demonstrating the differences between Interpretable AI and Explainable AI using customer churn prediction as a use case.
 
@@ -47,7 +47,7 @@ An interactive web application demonstrating the differences between Interpretab
    ```
 2. Access the web interface at:
    ```
-   http://localhost:8501
+   http://localhost:8501 or http://PublicIP:8501
    ```
 
 ## Model Details
