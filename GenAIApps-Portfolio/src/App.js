@@ -183,7 +183,7 @@ const App = () => {
 
           {/* Fifth App */}
           <div style={cardStyles}>  {/* Fixed: Removed extra closing tag */}
-            <a href={`http://${EC2_PUBLIC_IP}:8505`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <a href={`http://${EC2_PUBLIC_IP}:8000`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <h2 style={titleStyles}>Conversational AI Assistant</h2>
               <h3 style={subtitleStyles}>Powered by Chainlit</h3>
               <p style={descriptionStyles}>

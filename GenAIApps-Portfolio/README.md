@@ -57,7 +57,7 @@ MISTRAL_API_KEY="<YOUR_MISTRAL_API_KEY>"  # Replace with your Mistral API key
 - **Prompt Engineering**: http://publicIP:8502
 - **Nist-AI-RMF**: http://publicIP:8503
 - **Multi-Agent Collaboration using CrewAI**: http://publicIP:8504
-- **Conversational AI Assistant**: http://publicIP:8505
+- **Conversational AI Assistant**: http://publicIP:8000
 - **Interpretable Explainable AI**: http://publicIP:8506
 
 
