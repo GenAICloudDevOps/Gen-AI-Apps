@@ -6,99 +6,117 @@ const EC2_PUBLIC_IP = '54.158.93.206';
 const cardStyles = {
   background: 'rgba(255, 255, 255, 0.05)',
   borderRadius: '0.75rem',  // Reduced from 1rem
-  padding: '1.25rem',       // Reduced from 2rem
+  padding: '1.25rem 1.25rem 0.75rem',  // Reduced bottom padding
   backdropFilter: 'blur(10px)',
   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-  transition: 'transform 0.2s, box-shadow 0.2s',
+  transition: 'transform 0.2s ease-in-out',
   cursor: 'pointer',
   height: '100%',
   display: 'flex',
-  flexDirection: 'column'
+  flexDirection: 'column',
+  '&:hover': {
+    transform: 'translateY(-2px)',
+    boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15)'
+  }
 };
 
+// Update title styles
 const titleStyles = {
-  fontSize: '1.5rem',      // Reduced from 2rem
-  marginBottom: '0.5rem',  // Reduced from 1rem
+  fontSize: '2rem',          // Increased size
+  marginBottom: '0.3rem',    // Reduced spacing
   textAlign: 'center',
   color: 'white',
-  fontWeight: 'bold',
-  height: '40px',         // Reduced from 60px
+  fontWeight: '600',
+  height: '40px',           // Fixed height
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center'
+  justifyContent: 'center',
+  lineHeight: '1.2'
 };
 
 const subtitleStyles = {
-  fontSize: '1.1rem',      // Reduced from 1.25rem
+  fontSize: '1.4rem',       // Increased size
   color: '#a7f3d0',
-  marginBottom: '1rem',    // Reduced from 1.5rem
+  marginBottom: '0.4rem',   // Reduced spacing
   textAlign: 'center',
-  height: '35px',         // Reduced from 50px
+  height: '35px',          // Fixed height
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center'
+  justifyContent: 'center',
+  lineHeight: '1.2'
 };
 
 const descriptionStyles = {
   color: '#d1fae5',
-  marginBottom: '1rem',    // Reduced from 2rem
-  lineHeight: '1.4',       // Reduced from 1.6
+  marginBottom: '0.75rem',  // Reduced spacing
+  lineHeight: '1.4',
   flexGrow: 1,
-  fontSize: '1rem',        // Reduced from 1.1rem
+  fontSize: '1.25rem',     // Increased size
   textAlign: 'center',
-  padding: '0 0.5rem'      // Reduced from 1rem
+  padding: '0 0.5rem'
 };
 
 const buttonStyles = {
   background: '#4ade80',
   color: '#064e3b',
-  padding: '0.5rem 1.5rem', // Reduced padding
+  padding: '0.5rem 1.75rem',
   borderRadius: '9999px',
-  fontWeight: 'bold',
+  fontWeight: '600',
   border: 'none',
   cursor: 'pointer',
   transition: 'all 0.2s',
-  fontSize: '1rem'          // Reduced from 1.1rem
+  fontSize: '1.1rem',
+  marginTop: 'auto'        // Push button to bottom
 };
 
 const App = () => {
   return (
     <div style={{ backgroundColor: '#111827', minHeight: '100vh', color: 'white' }}>
-      {/* Header with minimal padding */}
+      {/* Reduced header padding */}
       <div style={{ textAlign: 'center', padding: '1.5rem 2rem 1rem' }}>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem', color: 'white' }}>
+        <h1 style={{ 
+          fontSize: '2.5rem',         // Reduced from 3rem
+          marginBottom: '0.5rem',     // Reduced from 1rem
+          color: 'white',
+          fontWeight: '600' 
+        }}>
           GenAI Apps - Portfolio
         </h1>
-        <p style={{ fontSize: '1.25rem', color: '#a7f3d0', marginBottom: '0.5rem' }}>
+        <p style={{ 
+          fontSize: '1.5rem',         // Reduced from 1.75rem
+          color: '#a7f3d0', 
+          marginBottom: '0.5rem',     // Reduced from 1rem
+          fontWeight: '500'
+        }}>
           Welcome to my GenAI Apps
         </p>
         <p style={{ 
-          fontSize: '1rem', 
+          fontSize: '1.25rem',        // Reduced from 1.35rem
           color: '#a7f3d0', 
           maxWidth: '800px', 
-          margin: '0 auto 1rem',
-          lineHeight: '1.4'
+          margin: '0 auto 1rem',      // Reduced from 2rem
+          lineHeight: '1.4',          // Reduced from 1.5
+          fontWeight: '400'
         }}>
-          Supports various document types, offers lightweight TF-IDF or Mistral's embedding for analysis, 
-          uses advanced chunking strategies, runs on AWS for reliability, provides context-aware responses, 
-          and includes customizable temperature and token limits along with real-time diagnostics
+          Elevate with AI that thinks*, learns, and evolves through Co-Intelligence
         </p>
       </div>
 
-      {/* Three-Two Row Layout with optimized spacing */}
+      {/* Main content with adjusted spacing */}
       <div style={{ 
         maxWidth: '1400px',
         margin: '0 auto', 
         padding: '0 2rem',
         display: 'flex',
         flexDirection: 'column',
-        gap: '1.5rem'
+        gap: '1.25rem',                // Adjusted gap between rows
+        marginBottom: '1.5rem'         // Reduced bottom margin
       }}>
-        {/* First Row - Three Apps */}
+        {/* First Row - Reduced gap */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '1.5rem'
+          gap: '1rem'                 // Reduced from 1.5rem
         }}>
           {/* First App */}
           <div style={cardStyles}>
@@ -143,14 +161,11 @@ const App = () => {
           </div>
         </div>
 
-        {/* Second Row - Two Apps */}
+        {/* Second Row - Reduced gap */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '1.5rem',
-          maxWidth: '1000px',  // Slightly narrower to maintain visual balance
-          margin: '0 auto',    // Center the second row
-          width: '100%'
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: '1rem'                 // Reduced from 1.5rem
         }}>
           {/* Fourth App */}
           <div style={cardStyles}>
@@ -179,12 +194,34 @@ const App = () => {
               </div>
             </a>
           </div>
+
+          {/* Sixth App */}
+          <div style={cardStyles}>
+            <a href={`http://${EC2_PUBLIC_IP}:8506`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <h2 style={titleStyles}>Interpretable & Explainable AI</h2>
+              <h3 style={subtitleStyles}>Understanding AI Decision Making</h3>
+              <p style={descriptionStyles}>
+                A Visual Journey Through Interpretable & Explainable AI
+              </p>
+              <div style={{ textAlign: 'center' }}>
+                <button style={buttonStyles}>Launch App →</button>
+              </div>
+            </a>
+          </div>
         </div>
       </div>
 
-      {/* Footer with minimal padding */}
-      <footer style={{ textAlign: 'center', padding: '1rem', color: '#9CA3AF', marginTop: '1rem' }}>
-        <p>© 2024 GenAI Apps Portfolio. All rights reserved.</p>
+      {/* Footer with adjusted spacing */}
+      <footer style={{ 
+        textAlign: 'center', 
+        padding: '0.75rem',
+        color: '#6B7280',
+        borderTop: '1px solid rgba(107, 114, 128, 0.1)',
+        backgroundColor: 'rgba(17, 24, 39, 0.8)'
+      }}>
+        <p style={{ fontSize: '0.875rem', margin: 0 }}>
+          Built with React & Streamlit
+        </p>
       </footer>
     </div>
   );

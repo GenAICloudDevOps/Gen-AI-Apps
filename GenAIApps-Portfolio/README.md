@@ -97,6 +97,26 @@ From React App you can launch other apps or directly go to other Apps.
 2. Define Agents Role, Goal, Backstory and Task Description
 3. Click Generate 
 
+### App5 Conversational AI Assistant using chainlit
+
+#### A powerful AI Assistant powered by Mistral AI and Chainlit. This application provides an interactive assistant that can engage in conversations, analyze documents, and maintain context throughout the interaction.
+
+- Interactive chat interface using Chainlit
+- File upload support for multiple formats (.txt, .pdf, .doc, .docx)
+- Powered by Mistral AI API for intelligent responses
+- Conversation history maintenance
+- Async operation for better performance
+
+### App6 Interpretable and Explainable AI
+
+#### An interactive web application demonstrating the differences between Interpretable AI and Explainable AI using customer churn prediction as a use case.
+
+- Interactive comparison of Interpretable AI (Decision Trees) and Explainable AI (Random Forest + SHAP)
+- Real-time model predictions and explanations
+- Visual representations of model decisions
+- Side-by-side comparison of different approaches
+
+
 ## Important Notices
 
 - **Cost Awareness**: Be mindful of AWS resources, Mistral APIs, and other resources consumption and costs before deployment
@@ -133,6 +153,10 @@ From React App you can launch other apps or directly go to other Apps.
 
 ### 8. App5: Conversational AI Assistant using Chainlit
 ![App5: Conversational AI Assistant using Chainlit](Screenshots/6.jpg)
+
+### 9. App6: Interpretable Explainable AI
+![App6: Interpretable Explainable AI](Screenshots/7.jpg)
+
 
 
 
