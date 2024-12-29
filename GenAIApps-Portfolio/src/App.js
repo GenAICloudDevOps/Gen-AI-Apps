@@ -262,7 +262,7 @@ const App = () => {
         backgroundColor: 'rgba(0, 12, 54, 0.8)'  // Matching main color with transparency
       }}>
         <p style={{ fontSize: '0.875rem', margin: 0 }}>
-          Built with React & Streamlit
+          Built with React Streamlit and Chainlit
         </p>
       </footer>
     </div>

@@ -1,0 +1,36 @@
+# Install Docker and configure service
+sudo yum install docker -y
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# Add current user to docker group (avoids using sudo for docker commands)
+sudo usermod -aG docker $USER     
+newgrp docker                     # Apply new group membership
+
+# Install Docker Compose
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+# View Docker resources
+docker images            # List downloaded images
+docker ps               # Show running containers
+docker ps -a            # Show all containers (including stopped)
+
+# Build and run services
+docker-compose build    # Build images
+docker-compose up -d    # Start containers detached
+
+# Stop/Remove everything
+docker stop $(docker ps -a -q)     # Stop all containers
+docker rm $(docker ps -a -q)       # Remove all containers
+docker rmi $(docker images -q)     # Remove all images
+
+# Individual management
+docker stop <container_id>         # Stop specific container
+docker rm <container_id>           # Remove container
+docker rmi <image_id>              # Remove image
+
+# Maintenance
+docker system prune               # Clean unused resources
+docker logs <container_id>        # View container logs
+docker stats                      # Show resource usage

@@ -1,0 +1,50 @@
+version: '3'
+services:
+  streamlit-app1-rag-documind:
+    build: .
+    command: streamlit run App1-RAG-DocuMind.py --server.port 8501
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+
+  streamlit-app2-prompteng:
+    build: .
+    command: streamlit run App2-PromptEng.py --server.port 8502
+    ports:
+      - "8502:8502"
+    env_file:
+      - .env
+
+  streamlit-app3-nist-ai-rmf:
+    build: .
+    command: streamlit run App3-Nist-AI-RMF.py --server.port 8503
+    ports:
+      - "8503:8503"
+    env_file:
+      - .env
+
+  streamlit-app4-multiagentcrewai:
+    build: .
+    command: streamlit run App4-MultiAgentCrewAI.py --server.port 8504
+    ports:
+      - "8504:8504"
+    env_file:
+      - .env
+
+  chainlit-app5-conversationalai:
+    build: .
+    command: chainlit run App5-ConversationalAI-Chainlit.py --port 8000
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+
+  streamlit-app6-interpretexplainai:
+    build: .
+    command: streamlit run App6-InterpretExplainAI.py --server.port 8506
+    ports:
+      - "8506:8506"
+    env_file:
+      - .env
+
