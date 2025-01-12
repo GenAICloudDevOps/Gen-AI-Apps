@@ -27,7 +27,7 @@
 #
 # 3. Components:
 #    - EC2: t3.medium instance (configurable)
-#    - RDS: PostgreSQL 16.1 on db.t4g.micro
+#    - RDS: PostgreSQL 16.3 on db.t4g.micro
 #    - S3: Versioned bucket with encryption
 #
 # Usage:
@@ -323,7 +323,7 @@ Resources:
     Properties:
       DBInstanceIdentifier: !Sub ${EnvironmentName}-postgres
       Engine: postgres
-      EngineVersion: '16.1'
+      EngineVersion: '16.3'
       MasterUsername: postgres
       MasterUserPassword: postgres
       DBInstanceClass: db.t4g.micro
