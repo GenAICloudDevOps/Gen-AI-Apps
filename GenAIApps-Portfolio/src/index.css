@@ -71,10 +71,4 @@ body {
   box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
-.status-indicator {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: #4CAF50;
-  box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
-}
+/* Remove .status-indicator class */

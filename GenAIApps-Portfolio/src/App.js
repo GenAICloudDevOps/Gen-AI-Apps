@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './styles/animations.css';
 
 const EC2_PUBLIC_IP = '54.162.147.9';
 
@@ -10,7 +11,6 @@ const cardStyles = {
   backdropFilter: 'blur(10px)',
   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)',
   border: '1px solid #3A3A3A',  // Added border
-  transition: 'transform 0.2s ease-in-out',
   cursor: 'pointer',
   height: '100%',
   display: 'flex',
@@ -22,18 +22,6 @@ const cardStyles = {
     boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
     border: '1px solid #8B5CF6'
   }
-};
-
-// Add status indicator styles
-const statusIndicator = {
-  position: 'absolute',
-  top: '10px',
-  right: '10px',
-  width: '10px',
-  height: '10px',
-  borderRadius: '50%',
-  backgroundColor: '#4CAF50', // Green for active
-  boxShadow: '0 0 8px rgba(76, 175, 80, 0.5)'
 };
 
 // Update title styles
@@ -154,17 +142,58 @@ const buttonStyles = {
 };
 
 const Card = ({ href, title, subtitle, description }) => {
+  const [isHovered, setIsHovered] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const handleClick = (e) => {
+    setLoading(true);
+    
+    // Reset loading state after 2 seconds
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    // Optional: Add error handling
+    window.addEventListener('beforeunload', () => {
+      setLoading(false);
+    });
+
+    // If the new window fails to open, reset loading state
+    try {
+      window.open(href, '_blank');
+    } catch (error) {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div style={cardStyles} role="article">
-      <div style={statusIndicator} title="App Status: Active" role="status" />
-      <a 
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={() => setLoading(true)}
-        style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}
+    <div 
+      className="card-enter"
+      style={{
+        ...cardStyles,
+        transform: isHovered ? 'scale(1.02) translateY(-5px)' : 'scale(1)',
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {isHovered && (
+        <div className="float-animation" style={{
+          position: 'absolute',
+          top: '-20px',
+          right: '-20px',
+          padding: '5px 10px',
+          background: 'rgba(139, 92, 246, 0.9)',
+          borderRadius: '15px',
+          fontSize: '0.8rem',
+          color: 'white',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+        }}>
+          Click to Launch
+        </div>
+      )}
+      <div 
+        onClick={handleClick}
+        style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}
         aria-label={`Open ${title} application`}
       >
         <h2 style={titleStyles}>{title}</h2>
@@ -172,14 +201,18 @@ const Card = ({ href, title, subtitle, description }) => {
         <p style={descriptionStyles}>{description}</p>
         <div style={{ textAlign: 'center' }}>
           <button 
-            style={buttonStyles}
+            style={{
+              ...buttonStyles,
+              opacity: loading ? 0.7 : 1,
+              cursor: loading ? 'wait' : 'pointer'
+            }}
             aria-label={`Launch ${title}`}
             disabled={loading}
           >
             {loading ? 'Loading...' : 'Launch App →'}
           </button>
         </div>
-      </a>
+      </div>
     </div>
   );
 };
@@ -218,32 +251,27 @@ const App = () => {
         padding: '0 2rem',
         display: 'flex',
         flexDirection: 'column',
-        gap: '1.25rem',                // Adjusted gap between rows
-        marginBottom: '1.5rem'         // Reduced bottom margin
+        gap: '1.25rem',
+        marginBottom: '1.5rem'
       }}>
-        {/* First Row - Reduced gap */}
+        {/* First Row - 3 apps */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '1rem'                 // Reduced from 1.5rem
+          gap: '1rem'
         }}>
-          {/* First App */}
           <Card 
             href={`http://${EC2_PUBLIC_IP}:8501`}
             title="RAG-DocuMind"
             subtitle="Intelligent Document Analysis & Response Platform"
             description="A Retrieval-Augmented Generation (RAG) application leveraging AWS services for document processing and analysis."
           />
-
-          {/* Second App */}
           <Card 
             href={`http://${EC2_PUBLIC_IP}:8502`}
             title="Prompt Engineering"
             subtitle="Summarize, Classify, Predict"
             description="A Retrieval-Augmented Generation (RAG) application using Streamlit and AWS allows users to summarize key information."
           />
-
-          {/* Third App */}
           <Card 
             href={`http://${EC2_PUBLIC_IP}:8503`}
             title="NIST AI RMF"
@@ -252,29 +280,24 @@ const App = () => {
           />
         </div>
 
-        {/* Second Row - Reduced gap */}
+        {/* Second Row - 3 apps */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '1rem'                 // Reduced from 1.5rem
+          gap: '1rem'
         }}>
-          {/* Fourth App */}
           <Card 
             href={`http://${EC2_PUBLIC_IP}:8504`}
             title="Multi-Agent Collaboration"
             subtitle="Collaborative AI using CrewAI"
             description="Define agents Roles and Expertise to work in tandem"
           />
-
-          {/* Fifth App */}
           <Card 
             href={`http://${EC2_PUBLIC_IP}:8000`}
             title="Conversational AI Assistant"
             subtitle="Powered by Chainlit"
             description="User-friendly interface for building and deploying powerful conversational AI"
           />
-
-          {/* Sixth App */}
           <Card 
             href={`http://${EC2_PUBLIC_IP}:8506`}
             title="Interpretable & Explainable AI"
@@ -300,20 +323,16 @@ const App = () => {
   );
 };
 
-const globalStyles = {
-  html: {
-    scrollBehavior: 'smooth',
-  },
-  '*:focus': {
-    outline: '2px solid #8B5CF6',
-    outlineOffset: '2px',
-  },
-  '@media (prefers-reduced-motion)': {
-    '*': {
-      transition: 'none !important',
-      animation: 'none !important',
+(() => {
+  const style = document.createElement('style');
+  style.textContent = `
+    html { scroll-behavior: smooth; }
+    *:focus { outline: 2px solid #8B5CF6; outline-offset: 2px; }
+    @media (prefers-reduced-motion) {
+      * { transition: none !important; animation: none !important; }
     }
-  }
-};
+  `;
+  document.head.appendChild(style);
+})();
 
 export default App;
