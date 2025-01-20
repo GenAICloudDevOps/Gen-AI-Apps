@@ -1,6 +1,6 @@
 import React from 'react';
 
-const EC2_PUBLIC_IP = '54.158.93.206';
+const EC2_PUBLIC_IP = '54.162.147.9';
 
 // Common styles for reusability and consistency
 const cardStyles = {
@@ -162,7 +162,10 @@ const App = () => {
         }}>
           {/* First App */}
           <div style={cardStyles}>
-            <a href={`http://${EC2_PUBLIC_IP}:8501`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <a href={`http://${EC2_PUBLIC_IP}:8501`} 
+               target="_blank" 
+               rel="noopener noreferrer" 
+               style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <h2 style={titleStyles}>RAG-DocuMind</h2>
               <h3 style={subtitleStyles}>Intelligent Document Analysis & Response Platform</h3>
               <p style={descriptionStyles}>
@@ -176,7 +179,10 @@ const App = () => {
 
           {/* Second App */}
           <div style={cardStyles}>
-            <a href={`http://${EC2_PUBLIC_IP}:8502`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <a href={`http://${EC2_PUBLIC_IP}:8502`}
+               target="_blank"
+               rel="noopener noreferrer"
+               style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <h2 style={titleStyles}>Prompt Engineering</h2>
               <h3 style={subtitleStyles}>Summarize, Classify, Predict</h3>
               <p style={descriptionStyles}>
@@ -190,7 +196,10 @@ const App = () => {
 
           {/* Third App */}
           <div style={cardStyles}>
-            <a href={`http://${EC2_PUBLIC_IP}:8503`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <a href={`http://${EC2_PUBLIC_IP}:8503`}
+               target="_blank"
+               rel="noopener noreferrer"
+               style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <h2 style={titleStyles}>NIST AI RMF</h2>
               <h3 style={subtitleStyles}>Generative Artificial Intelligence Profile</h3>
               <p style={descriptionStyles}>
@@ -211,7 +220,10 @@ const App = () => {
         }}>
           {/* Fourth App */}
           <div style={cardStyles}>
-            <a href={`http://${EC2_PUBLIC_IP}:8504`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <a href={`http://${EC2_PUBLIC_IP}:8504`}
+               target="_blank"
+               rel="noopener noreferrer"
+               style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <h2 style={titleStyles}>Multi-Agent Collaboration</h2>
               <h3 style={subtitleStyles}>Collaborative AI using CrewAI</h3>
               <p style={descriptionStyles}>
@@ -225,7 +237,10 @@ const App = () => {
 
           {/* Fifth App */}
           <div style={cardStyles}>  {/* Fixed: Removed extra closing tag */}
-            <a href={`http://${EC2_PUBLIC_IP}:8000`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <a href={`http://${EC2_PUBLIC_IP}:8000`}
+               target="_blank"
+               rel="noopener noreferrer"
+               style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <h2 style={titleStyles}>Conversational AI Assistant</h2>
               <h3 style={subtitleStyles}>Powered by Chainlit</h3>
               <p style={descriptionStyles}>
@@ -239,7 +254,10 @@ const App = () => {
 
           {/* Sixth App */}
           <div style={cardStyles}>
-            <a href={`http://${EC2_PUBLIC_IP}:8506`} style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <a href={`http://${EC2_PUBLIC_IP}:8506`}
+               target="_blank"
+               rel="noopener noreferrer"
+               style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
               <h2 style={titleStyles}>Interpretable & Explainable AI</h2>
               <h3 style={subtitleStyles}>Understanding AI Decision Making</h3>
               <p style={descriptionStyles}>
