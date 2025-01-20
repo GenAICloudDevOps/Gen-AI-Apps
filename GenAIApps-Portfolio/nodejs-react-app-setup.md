@@ -40,17 +40,23 @@ npm init -y
 npm install
 ```
 
-## 8. Additional Required Dependencies and update project files
-## Project Structure
+## 8. Project Structure
 ```
 streamlit-host/
 ├── src/
-│   ├── App.js            # Main application component
-│   ├── index.js          # Application entry point
-│   └── index.css         # Main stylesheet
-├── postcss.config.js     # PostCSS configuration
-├── tailwind.config.js    # Tailwind CSS configuration
-└── package.json          # Project configuration
+│   ├── components/
+│   │   ├── ErrorBoundary.js    # Error handling component
+│   │   └── ThemeToggle.js      # Theme switching component
+│   ├── styles/
+│   │   ├── animations.css      # Animation definitions
+│   │   └── Card.module.css     # Card component styles
+│   ├── App.js                  # Main application component
+│   ├── index.js                # Application entry point
+│   └── index.css               # Main stylesheet
+├── postcss.config.js           # PostCSS configuration
+├── tailwind.config.js          # Tailwind CSS configuration
+├── package.json                # Project configuration
+
 ```
 
 ## 9. Build and Run

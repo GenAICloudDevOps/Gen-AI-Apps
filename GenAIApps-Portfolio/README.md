@@ -132,6 +132,8 @@ From React App you can launch other apps or directly go to other Apps.
 
 ### 1. GenAI Apps - Portfolio
 ![GenAI Apps - Portfolio](Screenshots/1.jpg)
+![GenAI Apps - Portfolio](Screenshots/video.MP4)
+
 
 ### 2. App1 : RAG -DocuMind 
 ![App1 : RAG -DocuMind ](Screenshots/2.jpg)

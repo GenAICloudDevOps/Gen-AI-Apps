@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const EC2_PUBLIC_IP = '54.162.147.9';
 
@@ -15,10 +15,25 @@ const cardStyles = {
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
+  transform: 'scale(1)',
+  transition: 'all 0.3s ease-in-out',
   '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: '0 6px 8px rgba(0, 0, 0, 0.15)'
+    transform: 'scale(1.02)',
+    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
+    border: '1px solid #8B5CF6'
   }
+};
+
+// Add status indicator styles
+const statusIndicator = {
+  position: 'absolute',
+  top: '10px',
+  right: '10px',
+  width: '10px',
+  height: '10px',
+  borderRadius: '50%',
+  backgroundColor: '#4CAF50', // Green for active
+  boxShadow: '0 0 8px rgba(76, 175, 80, 0.5)'
 };
 
 // Update title styles
@@ -111,10 +126,62 @@ const buttonStyles = {
   transition: 'all 0.2s',
   fontSize: '1rem',
   marginTop: 'auto',
+  position: 'relative',
+  overflow: 'hidden',
   '&:hover': {
-    opacity: '0.9',  // Simple hover effect
-    color: '#FFFFFF'
+    transform: 'translateY(-2px)',
+    boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
+  },
+  '&:active': {
+    transform: 'translateY(1px)',
+  },
+  '&::after': {
+    content: '""',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    width: '0',
+    height: '0',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: '50%',
+    transform: 'translate(-50%, -50%)',
+    transition: 'width 0.3s, height 0.3s',
+  },
+  '&:hover::after': {
+    width: '200px',
+    height: '200px',
   }
+};
+
+const Card = ({ href, title, subtitle, description }) => {
+  const [loading, setLoading] = useState(false);
+
+  return (
+    <div style={cardStyles} role="article">
+      <div style={statusIndicator} title="App Status: Active" role="status" />
+      <a 
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => setLoading(true)}
+        style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}
+        aria-label={`Open ${title} application`}
+      >
+        <h2 style={titleStyles}>{title}</h2>
+        <h3 style={subtitleStyles}>{subtitle}</h3>
+        <p style={descriptionStyles}>{description}</p>
+        <div style={{ textAlign: 'center' }}>
+          <button 
+            style={buttonStyles}
+            aria-label={`Launch ${title}`}
+            disabled={loading}
+          >
+            {loading ? 'Loading...' : 'Launch App →'}
+          </button>
+        </div>
+      </a>
+    </div>
+  );
 };
 
 const App = () => {
@@ -161,55 +228,28 @@ const App = () => {
           gap: '1rem'                 // Reduced from 1.5rem
         }}>
           {/* First App */}
-          <div style={cardStyles}>
-            <a href={`http://${EC2_PUBLIC_IP}:8501`} 
-               target="_blank" 
-               rel="noopener noreferrer" 
-               style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <h2 style={titleStyles}>RAG-DocuMind</h2>
-              <h3 style={subtitleStyles}>Intelligent Document Analysis & Response Platform</h3>
-              <p style={descriptionStyles}>
-                A Retrieval-Augmented Generation (RAG) application leveraging AWS services for document processing and analysis.
-              </p>
-              <div style={{ textAlign: 'center' }}>
-                <button style={buttonStyles}>Launch App →</button>
-              </div>
-            </a>
-          </div>
+          <Card 
+            href={`http://${EC2_PUBLIC_IP}:8501`}
+            title="RAG-DocuMind"
+            subtitle="Intelligent Document Analysis & Response Platform"
+            description="A Retrieval-Augmented Generation (RAG) application leveraging AWS services for document processing and analysis."
+          />
 
           {/* Second App */}
-          <div style={cardStyles}>
-            <a href={`http://${EC2_PUBLIC_IP}:8502`}
-               target="_blank"
-               rel="noopener noreferrer"
-               style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <h2 style={titleStyles}>Prompt Engineering</h2>
-              <h3 style={subtitleStyles}>Summarize, Classify, Predict</h3>
-              <p style={descriptionStyles}>
-                A Retrieval-Augmented Generation (RAG) application using Streamlit and AWS allows users to summarize key information.
-              </p>
-              <div style={{ textAlign: 'center' }}>
-                <button style={buttonStyles}>Launch App →</button>
-              </div>
-            </a>
-          </div>
+          <Card 
+            href={`http://${EC2_PUBLIC_IP}:8502`}
+            title="Prompt Engineering"
+            subtitle="Summarize, Classify, Predict"
+            description="A Retrieval-Augmented Generation (RAG) application using Streamlit and AWS allows users to summarize key information."
+          />
 
           {/* Third App */}
-          <div style={cardStyles}>
-            <a href={`http://${EC2_PUBLIC_IP}:8503`}
-               target="_blank"
-               rel="noopener noreferrer"
-               style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <h2 style={titleStyles}>NIST AI RMF</h2>
-              <h3 style={subtitleStyles}>Generative Artificial Intelligence Profile</h3>
-              <p style={descriptionStyles}>
-                A Companion Resource for Implementing the AI RMF in Generative AI Systems.
-              </p>
-              <div style={{ textAlign: 'center' }}>
-                <button style={buttonStyles}>Launch App →</button>
-              </div>
-            </a>
-          </div>
+          <Card 
+            href={`http://${EC2_PUBLIC_IP}:8503`}
+            title="NIST AI RMF"
+            subtitle="Generative Artificial Intelligence Profile"
+            description="A Companion Resource for Implementing the AI RMF in Generative AI Systems."
+          />
         </div>
 
         {/* Second Row - Reduced gap */}
@@ -219,55 +259,28 @@ const App = () => {
           gap: '1rem'                 // Reduced from 1.5rem
         }}>
           {/* Fourth App */}
-          <div style={cardStyles}>
-            <a href={`http://${EC2_PUBLIC_IP}:8504`}
-               target="_blank"
-               rel="noopener noreferrer"
-               style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <h2 style={titleStyles}>Multi-Agent Collaboration</h2>
-              <h3 style={subtitleStyles}>Collaborative AI using CrewAI</h3>
-              <p style={descriptionStyles}>
-                Define agents Roles and Expertise to work in tandem
-              </p>
-              <div style={{ textAlign: 'center' }}>
-                <button style={buttonStyles}>Launch App →</button>
-              </div>
-            </a>
-          </div>
+          <Card 
+            href={`http://${EC2_PUBLIC_IP}:8504`}
+            title="Multi-Agent Collaboration"
+            subtitle="Collaborative AI using CrewAI"
+            description="Define agents Roles and Expertise to work in tandem"
+          />
 
           {/* Fifth App */}
-          <div style={cardStyles}>  {/* Fixed: Removed extra closing tag */}
-            <a href={`http://${EC2_PUBLIC_IP}:8000`}
-               target="_blank"
-               rel="noopener noreferrer"
-               style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <h2 style={titleStyles}>Conversational AI Assistant</h2>
-              <h3 style={subtitleStyles}>Powered by Chainlit</h3>
-              <p style={descriptionStyles}>
-                User-friendly interface for building and deploying powerful conversational AI
-              </p>
-              <div style={{ textAlign: 'center' }}>
-                <button style={buttonStyles}>Launch App →</button>
-              </div>
-            </a>
-          </div>
+          <Card 
+            href={`http://${EC2_PUBLIC_IP}:8000`}
+            title="Conversational AI Assistant"
+            subtitle="Powered by Chainlit"
+            description="User-friendly interface for building and deploying powerful conversational AI"
+          />
 
           {/* Sixth App */}
-          <div style={cardStyles}>
-            <a href={`http://${EC2_PUBLIC_IP}:8506`}
-               target="_blank"
-               rel="noopener noreferrer"
-               style={{ textDecoration: 'none', color: 'white', height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <h2 style={titleStyles}>Interpretable & Explainable AI</h2>
-              <h3 style={subtitleStyles}>Understanding AI Decision Making</h3>
-              <p style={descriptionStyles}>
-                A Visual Journey Through Interpretable & Explainable AI
-              </p>
-              <div style={{ textAlign: 'center' }}>
-                <button style={buttonStyles}>Launch App →</button>
-              </div>
-            </a>
-          </div>
+          <Card 
+            href={`http://${EC2_PUBLIC_IP}:8506`}
+            title="Interpretable & Explainable AI"
+            subtitle="Understanding AI Decision Making"
+            description="A Visual Journey Through Interpretable & Explainable AI"
+          />
         </div>
       </div>
 
@@ -285,6 +298,22 @@ const App = () => {
       </footer>
     </div>
   );
+};
+
+const globalStyles = {
+  html: {
+    scrollBehavior: 'smooth',
+  },
+  '*:focus': {
+    outline: '2px solid #8B5CF6',
+    outlineOffset: '2px',
+  },
+  '@media (prefers-reduced-motion)': {
+    '*': {
+      transition: 'none !important',
+      animation: 'none !important',
+    }
+  }
 };
 
 export default App;
