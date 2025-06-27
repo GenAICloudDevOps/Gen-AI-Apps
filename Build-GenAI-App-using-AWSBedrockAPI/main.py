@@ -3,6 +3,8 @@ import streamlit as st
 import json
 import boto3
 
+
+
 # Create the Streamlit app
 def main():
     st.markdown('''
@@ -33,18 +35,12 @@ def send_request(prompt):
 
     # Define the model ID for Claude 3 Sonnet
     bedrock_model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
-    
+   
     try:
         # Invoke the model using the Converse API
         response = bedrock.converse(
             modelId=bedrock_model_id,
-            messages=[{"role": "user", "content": [{"text": prompt}]}],
-            inferenceConfig={
-                "maxTokens": 1024,
-                "temperature": 0,
-                "topP": 0.5,
-                "stopSequences": []
-            }
+
         )
 
         # Parse the response
