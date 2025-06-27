@@ -29,32 +29,32 @@ def send_request(prompt):
     session = boto3.Session()
 
     # Create a Bedrock client
-    bedrock = session.client(service_name='bedrock-runtime', region_name='us-east-1') 
+    bedrock = session.client(service_name='bedrock-runtime', region_name='us-east-1')
 
-    # Define the model ID
-    bedrock_model_id = "mention the model ID" # update the Model ID 
+    # Define the model ID for Claude 3 Sonnet
+    bedrock_model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
     
-    # Build the request payload
-    body = json.dumps({
-        "prompt": prompt,
-        "maxTokens": 1024,
-        "temperature": 0,
-        "topP": 0.5,
-        "stopSequences": [],
-        "countPenalty": {"scale": 0 },
-        "presencePenalty": {"scale": 0 },
-        "frequencyPenalty": {"scale": 0 }
-    })
+    try:
+        # Invoke the model using the Converse API
+        response = bedrock.converse(
+            modelId=bedrock_model_id,
+            messages=[{"role": "user", "content": [{"text": prompt}]}],
+            inferenceConfig={
+                "maxTokens": 1024,
+                "temperature": 0,
+                "topP": 0.5,
+                "stopSequences": []
+            }
+        )
 
-    # Invoke the model
-    response = bedrock.invoke_model(body=body, modelId=bedrock_model_id, accept='application/json', contentType='application/json')
+        # Parse the response
+        response_text = response['output']['message']['content'][0]['text']
 
-    # Parse the response
-    response_body = json.loads(response.get('body').read())
-    response_text = response_body.get("completions")[0].get("data").get("text")
+        return response_text
 
-    # Return the response text
-    return response_text
+    except Exception as e:
+        st.error(f"Error invoking Bedrock API: {e}")
+        return "Sorry, I couldn't process your request."
 
 # Run the Streamlit app
 if __name__ == "__main__":

@@ -15,7 +15,7 @@ To install and run this application, follow the steps below:
 
 2. Clone the repository or copy the main.py file
 
-Note : Please modify the **code** to suit your specific needs. Clearly specify the **Model ID** that you intend to employ. For reference, during the testing phase of this application, the model **ai21.j2-ultra-v1** was utilized. Additionally, remember to update the region name accordingly
+Note : Please modify the **code** to suit your specific needs. The application now uses the **anthropic.claude-3-sonnet-20240229-v1:0** model (Claude 3 Sonnet). Ensure your AWS Bedrock region supports this model. Remember to update the region name in `main.py` if necessary.
 
 3. Set up AWS credentials
 
