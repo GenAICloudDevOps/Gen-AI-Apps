@@ -1,0 +1,46 @@
+{
+  "apps": [
+    {
+      "id": "ai-chat",
+      "name": "AI Chat",
+      "description": "Chat with AI using AWS Bedrock Claude models",
+      "icon": "Calculator",
+      "url": "http://localhost:8501",
+      "category": "ai",
+      "version": "1.0.0",
+      "status": "active",
+      "type": "streamlit",
+      "port": 8501,
+      "file": "ai_chat.py",
+      "docker_service": "ai-chat"
+    },
+    {
+      "id": "document-analysis",
+      "name": "Document Analysis",
+      "description": "Analyze documents with AI - summaries, key points, and insights",
+      "icon": "FileText",
+      "url": "http://localhost:8502",
+      "category": "analysis",
+      "version": "1.0.0",
+      "status": "active",
+      "type": "streamlit",
+      "port": 8502,
+      "file": "document_analysis.py",
+      "docker_service": "document-analysis"
+    },
+    {
+      "id": "web-search",
+      "name": "Web Search",
+      "description": "AI-powered web search using DuckDuckGo and AWS Bedrock",
+      "icon": "Activity",
+      "url": "http://localhost:8503",
+      "category": "search",
+      "version": "1.0.0",
+      "status": "active",
+      "type": "streamlit",
+      "port": 8503,
+      "file": "web_search.py",
+      "docker_service": "web-search"
+    }
+  ]
+}
