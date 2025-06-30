@@ -30,7 +30,7 @@ A modular, production-ready platform built with React, FastAPI, Streamlit, and A
 
 ### Document Analysis App
 ![Document Analysis](screenshots/4.png)
-*Streamlit-based document analysis interface with drag-and-drop file upload and multiple analysis options*
+*Streamlit-based document analysis interface with file upload and analysis*
 
 ## 🏗️ Architecture
 
