@@ -12,6 +12,20 @@ RUN npm install
 # Copy source code
 COPY . .
 
+# Build arguments for environment-specific builds
+ARG REACT_APP_API_URL=http://localhost:8000/api/v1
+ARG REACT_APP_BACKEND_URL=http://localhost:8000
+ARG REACT_APP_AI_CHAT_URL=http://localhost:8501
+ARG REACT_APP_DOCUMENT_ANALYSIS_URL=http://localhost:8502
+ARG REACT_APP_WEB_SEARCH_URL=http://localhost:8503
+
+# Set environment variables for build
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+ENV REACT_APP_BACKEND_URL=$REACT_APP_BACKEND_URL
+ENV REACT_APP_AI_CHAT_URL=$REACT_APP_AI_CHAT_URL
+ENV REACT_APP_DOCUMENT_ANALYSIS_URL=$REACT_APP_DOCUMENT_ANALYSIS_URL
+ENV REACT_APP_WEB_SEARCH_URL=$REACT_APP_WEB_SEARCH_URL
+
 # Build the app
 RUN npm run build
 

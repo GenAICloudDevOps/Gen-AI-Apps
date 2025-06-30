@@ -1,10 +1,11 @@
 """
 Document Analysis Streamlit App
-Analyze documents using AWS Bedrock
+Environment-aware document analysis using AWS Bedrock
 """
 import streamlit as st
 import requests
 import io
+import os
 
 # App configuration
 st.set_page_config(
@@ -13,9 +14,20 @@ st.set_page_config(
     layout="centered"
 )
 
+# Environment-aware configuration
+DEPLOYMENT_ENV = os.getenv("DEPLOYMENT_ENV", "local")
+HOST_IP = os.getenv("HOST_IP", "localhost")
+PUBLIC_IP = os.getenv("PUBLIC_IP", "localhost")
+
 # Backend API URL - Use environment variable for Docker networking
-import os
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000") + "/api/v1/bedrock"
+
+def get_app_url():
+    """Get the current app URL based on environment"""
+    if DEPLOYMENT_ENV == "cloud":
+        return f"http://{PUBLIC_IP}:8502"
+    else:
+        return "http://localhost:8502"
 
 def analyze_text(text, analysis_type):
     """Analyze text using backend API"""
@@ -113,6 +125,43 @@ def main():
                     st.write(result)
         else:
             st.info("Please enter some text to analyze.")
+    
+    # Sidebar with environment info
+    with st.sidebar:
+        st.header("App Info")
+        st.write("**Document Analysis**")
+        st.write("Analyze documents with AI")
+        
+        st.header("Environment")
+        st.write(f"**Environment:** {DEPLOYMENT_ENV}")
+        st.write(f"**Host IP:** {HOST_IP}")
+        if DEPLOYMENT_ENV == "cloud":
+            st.write(f"**Public IP:** {PUBLIC_IP}")
+        st.write(f"**App URL:** {get_app_url()}")
+        
+        # Backend connectivity test
+        if st.button("Test Backend"):
+            with st.spinner("Testing..."):
+                try:
+                    response = requests.get(API_BASE_URL.replace("/api/v1/bedrock", "/health"), timeout=5)
+                    if response.status_code == 200:
+                        st.success("✅ Backend connected")
+                    else:
+                        st.error("❌ Backend not responding")
+                except:
+                    st.error("❌ Backend connection failed")
+        
+        st.header("Supported Formats")
+        st.write("• PDF files")
+        st.write("• Word documents (.docx)")
+        st.write("• Text files (.txt)")
+        st.write("• Plain text input")
+        
+        st.header("Analysis Types")
+        st.write("• **Summary:** Key points overview")
+        st.write("• **Key Points:** Important highlights")
+        st.write("• **Questions:** Relevant questions")
+        st.write("• **Detailed:** Comprehensive analysis")
 
 if __name__ == "__main__":
     main()

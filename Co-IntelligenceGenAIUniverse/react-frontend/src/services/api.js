@@ -1,7 +1,27 @@
 import axios from 'axios';
 
+// Environment-aware API configuration
+const getApiBaseUrl = () => {
+  // Check if we're in build time (environment variables are baked in)
+  if (process.env.REACT_APP_API_URL) {
+    return process.env.REACT_APP_API_URL;
+  }
+  
+  // Runtime detection for dynamic environments
+  const hostname = window.location.hostname;
+  
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:8000/api/v1';
+  } else {
+    // Assume cloud deployment with same hostname
+    return `http://${hostname}:8000/api/v1`;
+  }
+};
+
 // API configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_BASE_URL = getApiBaseUrl();
+
+console.log('API Base URL:', API_BASE_URL);
 
 // Create axios instance
 const api = axios.create({
@@ -34,6 +54,30 @@ api.interceptors.response.use(
   }
 );
 
+// Environment configuration service
+export const configService = {
+  async getConfig() {
+    try {
+      const response = await api.get('/config');
+      return response.data;
+    } catch (error) {
+      console.warn('Failed to fetch config, using defaults:', error.message);
+      return {
+        deployment_env: 'local',
+        host_ip: 'localhost',
+        public_ip: 'localhost',
+        urls: {
+          backend: 'http://localhost:8000',
+          frontend: 'http://localhost:3000',
+          ai_chat: 'http://localhost:8501',
+          document_analysis: 'http://localhost:8502',
+          web_search: 'http://localhost:8503'
+        }
+      };
+    }
+  }
+};
+
 // API service functions
 export const apiService = {
   // Health check
@@ -46,10 +90,15 @@ export const apiService = {
     }
   },
 
+  // Get environment configuration
+  async getConfig() {
+    return configService.getConfig();
+  },
+
   // Get all apps
   async getApps() {
     try {
-      const response = await api.get('/api/v1/apps');
+      const response = await api.get('/apps');
       return response.data;
     } catch (error) {
       throw new Error(`Failed to fetch apps: ${error.message}`);
@@ -59,7 +108,7 @@ export const apiService = {
   // Get specific app info
   async getAppInfo(appId) {
     try {
-      const response = await api.get(`/api/v1/apps/${appId}`);
+      const response = await api.get(`/apps/${appId}`);
       return response.data;
     } catch (error) {
       throw new Error(`Failed to fetch app info: ${error.message}`);
@@ -69,7 +118,7 @@ export const apiService = {
   // Add new app
   async addApp(appData) {
     try {
-      const response = await api.post('/api/v1/apps', appData);
+      const response = await api.post('/apps', appData);
       return response.data;
     } catch (error) {
       throw new Error(`Failed to add app: ${error.message}`);
@@ -79,7 +128,7 @@ export const apiService = {
   // Update app
   async updateApp(appId, appData) {
     try {
-      const response = await api.put(`/api/v1/apps/${appId}`, appData);
+      const response = await api.put(`/apps/${appId}`, appData);
       return response.data;
     } catch (error) {
       throw new Error(`Failed to update app: ${error.message}`);
@@ -89,7 +138,7 @@ export const apiService = {
   // Delete app
   async deleteApp(appId) {
     try {
-      const response = await api.delete(`/api/v1/apps/${appId}`);
+      const response = await api.delete(`/apps/${appId}`);
       return response.data;
     } catch (error) {
       throw new Error(`Failed to delete app: ${error.message}`);
@@ -99,7 +148,7 @@ export const apiService = {
   // Get system stats
   async getSystemStats() {
     try {
-      const response = await api.get('/api/v1/system/stats');
+      const response = await api.get('/system/stats');
       return response.data;
     } catch (error) {
       throw new Error(`Failed to fetch system stats: ${error.message}`);
@@ -109,7 +158,7 @@ export const apiService = {
   // Bedrock API calls
   async chat(message, conversationHistory = []) {
     try {
-      const response = await api.post('/api/v1/bedrock/chat', {
+      const response = await api.post('/bedrock/chat', {
         message,
         conversation_history: conversationHistory
       });
@@ -121,7 +170,7 @@ export const apiService = {
 
   async analyzeText(text, analysisType = 'summary') {
     try {
-      const response = await api.post('/api/v1/bedrock/analyze-text', {
+      const response = await api.post('/bedrock/analyze-text', {
         text,
         analysis_type: analysisType
       });
@@ -137,7 +186,7 @@ export const apiService = {
       formData.append('file', file);
       formData.append('analysis_type', analysisType);
 
-      const response = await api.post('/api/v1/bedrock/analyze-document', formData, {
+      const response = await api.post('/bedrock/analyze-document', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

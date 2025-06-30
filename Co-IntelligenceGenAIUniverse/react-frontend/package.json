@@ -21,7 +21,10 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:local": "REACT_APP_API_URL=http://localhost:8000/api/v1 REACT_APP_BACKEND_URL=http://localhost:8000 react-scripts start",
     "build": "react-scripts build",
+    "build:local": "REACT_APP_API_URL=http://localhost:8000/api/v1 REACT_APP_BACKEND_URL=http://localhost:8000 react-scripts build",
+    "build:cloud": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

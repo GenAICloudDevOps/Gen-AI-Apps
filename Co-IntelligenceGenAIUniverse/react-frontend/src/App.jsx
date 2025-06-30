@@ -213,7 +213,7 @@ function App() {
       {/* Co-Intelligence label below header, top-right */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
         <div className="flex justify-end">
-          <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} animate-breathing`}>
+          <span className={`text-base ${darkMode ? 'text-gray-400' : 'text-gray-600'} animate-breathing`}>
             Co-Intelligence
           </span>
         </div>
@@ -237,22 +237,7 @@ function App() {
           </p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          {stats.map((stat, index) => (
-            <div key={index} className={`${stat.bgColor} rounded-xl p-6 border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className={`text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{stat.title}</p>
-                  <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>{stat.value}</p>
-                </div>
-                <div className={`bg-gradient-to-r ${stat.color} p-3 rounded-lg`}>
-                  <stat.icon className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+
 
         {/* Management Panel */}
         {showManagement && (
@@ -384,6 +369,23 @@ function App() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {stats.map((stat, index) => (
+            <div key={index} className={`${stat.bgColor} rounded-xl p-6 border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{stat.title}</p>
+                  <p className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>{stat.value}</p>
+                </div>
+                <div className={`bg-gradient-to-r ${stat.color} p-3 rounded-lg`}>
+                  <stat.icon className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Quick Links */}

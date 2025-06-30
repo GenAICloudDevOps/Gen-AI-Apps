@@ -2,7 +2,6 @@
 node_modules/
 build/
 dist/
-.env.local
 .env.development.local
 .env.test.local
 .env.production.local
@@ -22,8 +21,7 @@ venv/
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Environment & Secrets
-.env
+# Secrets & Keys (Keep these private)
 *.key
 *.pem
 config/local.json
@@ -46,3 +44,6 @@ Thumbs.db
 logs/
 tmp/
 temp/
+
+# Note: .env files are now included in the repository with placeholder values
+# Users should update them with their actual credentials locally

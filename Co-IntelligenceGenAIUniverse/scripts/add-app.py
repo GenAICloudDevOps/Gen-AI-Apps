@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Enhanced App Creation Script
-Creates new Streamlit apps with full integration
+Creates new Streamlit apps with full integration and environment awareness
 """
 import json
 import os
@@ -10,7 +10,7 @@ import subprocess
 import argparse
 from pathlib import Path
 
-def get_next_available_port(start_port=8503):
+def get_next_available_port(start_port=8504):
     """Get the next available port"""
     # Read current apps config
     try:
@@ -28,7 +28,7 @@ def get_next_available_port(start_port=8503):
         return start_port
 
 def create_streamlit_app(app_name, description, category="custom", icon="Calculator"):
-    """Create a new Streamlit app with full integration"""
+    """Create a new Streamlit app with full integration and environment awareness"""
     
     # Validate inputs
     if not app_name or not description:
@@ -48,10 +48,11 @@ def create_streamlit_app(app_name, description, category="custom", icon="Calcula
     if os.path.exists(f"apps/{file_name}"):
         raise FileExistsError(f"App file apps/{file_name} already exists")
     
-    # Create the Streamlit app file
+    # Create the Streamlit app file with environment awareness
     app_template = f'''"""
 {app_name} Streamlit App
 {description}
+Environment-aware Streamlit application
 """
 import streamlit as st
 import requests
@@ -65,11 +66,23 @@ st.set_page_config(
     layout="centered"
 )
 
+# Environment-aware configuration
+DEPLOYMENT_ENV = os.getenv("DEPLOYMENT_ENV", "local")
+HOST_IP = os.getenv("HOST_IP", "localhost")
+PUBLIC_IP = os.getenv("PUBLIC_IP", "localhost")
+
 # Backend API URL - Use environment variable for Docker networking
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000") + "/api/v1/bedrock"
 
+def get_app_url():
+    """Get the current app URL based on environment"""
+    if DEPLOYMENT_ENV == "cloud":
+        return f"http://{{PUBLIC_IP}}:{port}"
+    else:
+        return f"http://localhost:{port}"
+
 def call_backend_api(endpoint, data=None, method="POST"):
-    """Call backend API"""
+    """Call backend API with error handling"""
     try:
         if method == "POST":
             response = requests.post(
@@ -94,12 +107,31 @@ def main():
     st.title("🔧 {app_name}")
     st.write("{description}")
     
-    # Sidebar for app info
+    # Environment info in sidebar
     with st.sidebar:
         st.header("App Info")
         st.write(f"**Category:** {category}")
         st.write(f"**Port:** {port}")
         st.write(f"**Version:** 1.0.0")
+        
+        st.header("Environment")
+        st.write(f"**Environment:** {{DEPLOYMENT_ENV}}")
+        st.write(f"**Host IP:** {{HOST_IP}}")
+        if DEPLOYMENT_ENV == "cloud":
+            st.write(f"**Public IP:** {{PUBLIC_IP}}")
+        st.write(f"**App URL:** {{get_app_url()}}")
+        
+        # Backend connectivity test
+        if st.button("Test Backend"):
+            with st.spinner("Testing..."):
+                try:
+                    response = requests.get(API_BASE_URL.replace("/api/v1/bedrock", "/health"), timeout=5)
+                    if response.status_code == 200:
+                        st.success("✅ Backend connected")
+                    else:
+                        st.error("❌ Backend not responding")
+                except:
+                    st.error("❌ Backend connection failed")
     
     # Main content area
     st.header("Features")
@@ -155,7 +187,7 @@ def main():
     st.subheader("Custom Features")
     st.info("Add your custom functionality here!")
     
-    # Example: Simple calculator
+    # Example: Simple calculator for utility apps
     if category == "utility":
         st.write("**Simple Calculator:**")
         col1, col2, col3 = st.columns(3)
@@ -180,6 +212,14 @@ def main():
                 st.success(f"Result: {{result}}")
             except Exception as e:
                 st.error(f"Error: {{e}}")
+    
+    # Environment-specific features
+    if DEPLOYMENT_ENV == "cloud":
+        st.subheader("Cloud Features")
+        st.info("This app is running in the cloud! Add cloud-specific features here.")
+    else:
+        st.subheader("Local Development")
+        st.info("This app is running locally. Perfect for development and testing!")
 
 if __name__ == "__main__":
     main()
@@ -191,12 +231,12 @@ if __name__ == "__main__":
     
     print(f"✅ Created apps/{file_name}")
     
-    # Update apps.json
+    # Update apps.json with environment awareness
     try:
         with open('config/apps.json', 'r') as f:
             config = json.load(f)
     except FileNotFoundError:
-        config = {"apps": []}
+        config = {"apps": [], "config": {"version": "2.0.0", "supports_environments": True}}
     
     new_app = {
         "id": service_name,
@@ -210,7 +250,8 @@ if __name__ == "__main__":
         "type": "streamlit",
         "port": port,
         "file": file_name,
-        "docker_service": service_name
+        "docker_service": service_name,
+        "environment_aware": True
     }
     
     config["apps"].append(new_app)
@@ -224,7 +265,7 @@ if __name__ == "__main__":
     
     print("✅ Updated config/apps.json")
     
-    # Update docker-compose.yml
+    # Update docker-compose.yml with environment awareness
     docker_service = f'''
   # {app_name} Streamlit App
   {service_name}:
@@ -237,6 +278,9 @@ if __name__ == "__main__":
       - STREAMLIT_SERVER_PORT={port}
       - STREAMLIT_SERVER_ADDRESS=0.0.0.0
       - API_BASE_URL=http://backend:8000
+      - DEPLOYMENT_ENV=${{DEPLOYMENT_ENV:-local}}
+      - HOST_IP=${{HOST_IP:-localhost}}
+      - PUBLIC_IP=${{PUBLIC_IP:-localhost}}
     volumes:
       - ./apps:/app
     command: streamlit run {file_name} --server.port={port} --server.address=0.0.0.0 --server.headless=true
@@ -252,8 +296,42 @@ if __name__ == "__main__":
       retries: 3
 '''
     
-    # Backup docker-compose.yml
+    # Update production docker-compose.yml as well
+    docker_service_prod = f'''
+  # {app_name} Streamlit App
+  {service_name}:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    ports:
+      - "{port}:{port}"
+    environment:
+      - STREAMLIT_SERVER_PORT={port}
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - API_BASE_URL=http://backend:8000
+      - DEPLOYMENT_ENV=cloud
+      - HOST_IP=0.0.0.0
+      - PUBLIC_IP=${{PUBLIC_IP}}
+    volumes:
+      - ./apps:/app
+    command: streamlit run {file_name} --server.port={port} --server.address=0.0.0.0 --server.headless=true
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:{port}/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+'''
+    
+    # Backup docker-compose files
     subprocess.run(['cp', 'docker-compose.yml', 'docker-compose.yml.backup'])
+    if os.path.exists('docker-compose.prod.yml'):
+        subprocess.run(['cp', 'docker-compose.prod.yml', 'docker-compose.prod.yml.backup'])
     
     # Add service to docker-compose.yml
     with open('docker-compose.yml', 'r') as f:
@@ -269,13 +347,33 @@ if __name__ == "__main__":
     else:
         print("⚠️  Could not automatically update docker-compose.yml")
     
+    # Add service to docker-compose.prod.yml
+    if os.path.exists('docker-compose.prod.yml'):
+        with open('docker-compose.prod.yml', 'r') as f:
+            content = f.read()
+        
+        networks_pos = content.find('networks:')
+        if networks_pos != -1:
+            new_content = content[:networks_pos] + docker_service_prod + '\n' + content[networks_pos:]
+            with open('docker-compose.prod.yml', 'w') as f:
+                f.write(new_content)
+            print("✅ Updated docker-compose.prod.yml")
+    
     print(f"""
 🎉 App created successfully!
 
 📋 Next steps:
 1. Customize your app in apps/{file_name}
-2. Restart services: docker-compose up --build -d
-3. Access your app at: http://localhost:{port}
+2. Restart services: ./scripts/deploy.sh
+3. Access your app:
+   - Local: http://localhost:{port}
+   - Cloud: http://YOUR_PUBLIC_IP:{port}
+
+🌍 Environment Features:
+- ✅ Environment detection (local/cloud)
+- ✅ Dynamic URL configuration
+- ✅ Backend connectivity testing
+- ✅ Environment-specific features
 
 🔧 The app will automatically appear in the React frontend after restart.
 """)
@@ -288,7 +386,7 @@ if __name__ == "__main__":
     }
 
 def main():
-    parser = argparse.ArgumentParser(description='Create a new Streamlit app')
+    parser = argparse.ArgumentParser(description='Create a new environment-aware Streamlit app')
     parser.add_argument('name', help='App name (e.g., "Weather App")')
     parser.add_argument('description', help='App description')
     parser.add_argument('--category', default='custom', help='App category (default: custom)')

@@ -1,6 +1,6 @@
 """
 Web Search Streamlit App
-AI-powered web search using DuckDuckGo and AWS Bedrock
+Environment-aware AI-powered web search using DuckDuckGo and AWS Bedrock
 """
 import streamlit as st
 import requests
@@ -16,8 +16,20 @@ st.set_page_config(
     layout="centered"
 )
 
+# Environment-aware configuration
+DEPLOYMENT_ENV = os.getenv("DEPLOYMENT_ENV", "local")
+HOST_IP = os.getenv("HOST_IP", "localhost")
+PUBLIC_IP = os.getenv("PUBLIC_IP", "localhost")
+
 # Backend API URL - Use environment variable for Docker networking
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000") + "/api/v1/bedrock"
+
+def get_app_url():
+    """Get the current app URL based on environment"""
+    if DEPLOYMENT_ENV == "cloud":
+        return f"http://{PUBLIC_IP}:8503"
+    else:
+        return "http://localhost:8503"
 
 def search_web(query, max_results=5):
     """Search web using DuckDuckGo with rate limiting and retry logic"""
@@ -164,6 +176,43 @@ def main():
                             st.error(ai_analysis)
             else:
                 st.warning("No search results found. Try a different query or wait a moment before trying again.")
+    
+    # Sidebar with environment info
+    with st.sidebar:
+        st.header("App Info")
+        st.write("**Web Search with AI**")
+        st.write("Search the web and get AI insights")
+        
+        st.header("Environment")
+        st.write(f"**Environment:** {DEPLOYMENT_ENV}")
+        st.write(f"**Host IP:** {HOST_IP}")
+        if DEPLOYMENT_ENV == "cloud":
+            st.write(f"**Public IP:** {PUBLIC_IP}")
+        st.write(f"**App URL:** {get_app_url()}")
+        
+        # Backend connectivity test
+        if st.button("Test Backend"):
+            with st.spinner("Testing..."):
+                try:
+                    response = requests.get(API_BASE_URL.replace("/api/v1/bedrock", "/health"), timeout=5)
+                    if response.status_code == 200:
+                        st.success("✅ Backend connected")
+                    else:
+                        st.error("❌ Backend not responding")
+                except:
+                    st.error("❌ Backend connection failed")
+        
+        st.header("Search Tips")
+        st.write("• Use specific keywords")
+        st.write("• Wait 3+ seconds between searches")
+        st.write("• Try 3-5 results for faster response")
+        st.write("• Be patient with rate limits")
+        
+        st.header("Features")
+        st.write("• **Web Search:** DuckDuckGo integration")
+        st.write("• **AI Analysis:** AWS Bedrock insights")
+        st.write("• **Rate Limiting:** Smart retry logic")
+        st.write("• **Multi-source:** Comprehensive results")
     
     # Instructions
     with st.expander("ℹ️ How it works", expanded=False):
