@@ -25,6 +25,7 @@ import {
   Database,
   Layers
 } from 'lucide-react';
+import { apiService, configService } from './services/api';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -35,13 +36,31 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [showManagement, setShowManagement] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [config, setConfig] = useState(null);
+  const [environmentInfo, setEnvironmentInfo] = useState({
+    deployment_env: 'local',
+    urls: {
+      backend: 'http://localhost:8000',
+      frontend: 'http://localhost:3000',
+      ai_chat: 'http://localhost:8501',
+      document_analysis: 'http://localhost:8502',
+      web_search: 'http://localhost:8503'
+    }
+  });
 
   useEffect(() => {
-    fetchData();
-    // Set up auto-refresh every 30 seconds
-    const interval = setInterval(fetchData, 30000);
-    return () => clearInterval(interval);
+    // Initialize environment configuration first
+    initializeEnvironment();
   }, []);
+
+  useEffect(() => {
+    if (config) {
+      fetchData();
+      // Set up auto-refresh every 30 seconds
+      const interval = setInterval(fetchData, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [config]);
 
   // Load dark mode preference
   useEffect(() => {
@@ -61,37 +80,85 @@ function App() {
     }
   }, [darkMode]);
 
+  const initializeEnvironment = async () => {
+    try {
+      console.log('🔧 Initializing environment configuration...');
+      const envConfig = await configService.getConfig();
+      console.log('🌍 Environment config loaded:', envConfig);
+      
+      setConfig(envConfig);
+      setEnvironmentInfo(envConfig);
+      
+      // Update document title based on environment
+      document.title = `Co-Intelligence GenAI Universe - ${envConfig.deployment_env === 'cloud' ? 'Cloud' : 'Local'}`;
+      
+    } catch (error) {
+      console.warn('⚠️ Failed to load environment config, using defaults:', error);
+      // Keep default localhost configuration
+      setConfig(environmentInfo);
+    }
+  };
+
   const fetchData = async () => {
+    if (!config) {
+      console.log('⏳ Config not loaded yet, skipping data fetch...');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     
     try {
-      // Fetch system health
-      const healthResponse = await fetch('http://localhost:8000/health');
-      const healthData = await healthResponse.json();
+      console.log('📡 Fetching data using environment-aware API service...');
+      
+      // Use the centralized API service instead of direct fetch calls
+      const [healthData, appsData, statsData] = await Promise.all([
+        apiService.healthCheck().catch(err => {
+          console.warn('Health check failed:', err.message);
+          return null;
+        }),
+        apiService.getApps().catch(err => {
+          console.warn('Apps fetch failed:', err.message);
+          return { apps: [] };
+        }),
+        apiService.getSystemStats().catch(err => {
+          console.warn('Stats fetch failed:', err.message);
+          return { stats: {} };
+        })
+      ]);
+
       setSystemHealth(healthData);
-
-      // Fetch apps
-      const appsResponse = await fetch('http://localhost:8000/api/v1/apps');
-      const appsData = await appsResponse.json();
       setApps(appsData.apps || []);
-
-      // Fetch system stats
-      const statsResponse = await fetch('http://localhost:8000/api/v1/system/stats');
-      const statsData = await statsResponse.json();
       setSystemStats(statsData.stats || {});
 
       setLastUpdated(new Date());
       setLoading(false);
+      
+      console.log('✅ Data fetch completed successfully');
     } catch (err) {
-      console.error('API Error:', err);
+      console.error('❌ API Error:', err);
       setError(err.message);
       setLoading(false);
     }
   };
 
   const handleLaunchApp = (app) => {
-    window.open(app.url, '_blank', 'noopener,noreferrer');
+    // Use environment-aware URL from app configuration or fallback to environment info
+    const appUrl = app.url || getEnvironmentAwareUrl(app.port);
+    console.log(`🚀 Launching app: ${app.name} at ${appUrl}`);
+    window.open(appUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  const getEnvironmentAwareUrl = (port) => {
+    if (!environmentInfo || !environmentInfo.urls) {
+      return `http://localhost:${port}`;
+    }
+    
+    const baseUrl = environmentInfo.deployment_env === 'cloud' 
+      ? environmentInfo.urls.backend.replace(':8000', '') 
+      : 'http://localhost';
+    
+    return `${baseUrl}:${port}`;
   };
 
   if (loading) {
@@ -100,7 +167,12 @@ function App() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600 mx-auto mb-4"></div>
           <h2 className={`text-2xl font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-2`}>Loading Co-Intelligence GenAI Universe</h2>
-          <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Initializing AI-powered applications...</p>
+          <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-2`}>Initializing AI-powered applications...</p>
+          {environmentInfo && (
+            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              Environment: {environmentInfo.deployment_env || 'detecting...'}
+            </p>
+          )}
         </div>
       </div>
     );
@@ -181,6 +253,11 @@ function App() {
                   {systemHealth ? 'Online' : 'Offline'}
                 </span>
               </div>
+              {environmentInfo && (
+                <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'} hidden sm:block`}>
+                  {environmentInfo.deployment_env === 'cloud' ? '☁️ Cloud' : '🏠 Local'}
+                </div>
+              )}
               <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 Updated: {lastUpdated.toLocaleTimeString()}
               </div>
@@ -393,7 +470,7 @@ function App() {
           <h3 className="text-2xl font-bold mb-4">Quick Access</h3>
           <div className="flex flex-wrap justify-center gap-4">
             <a
-              href="http://localhost:8000/docs"
+              href={`${environmentInfo?.urls?.backend || 'http://localhost:8000'}/docs`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
@@ -402,7 +479,7 @@ function App() {
               <span>API Docs</span>
             </a>
             <a
-              href="http://localhost:8501"
+              href={environmentInfo?.urls?.ai_chat || 'http://localhost:8501'}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
@@ -411,7 +488,7 @@ function App() {
               <span>AI Chat</span>
             </a>
             <a
-              href="http://localhost:8502"
+              href={environmentInfo?.urls?.document_analysis || 'http://localhost:8502'}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"
@@ -420,7 +497,7 @@ function App() {
               <span>Document Analysis</span>
             </a>
             <a
-              href="http://localhost:8503"
+              href={environmentInfo?.urls?.web_search || 'http://localhost:8503'}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-lg transition-colors flex items-center space-x-2"

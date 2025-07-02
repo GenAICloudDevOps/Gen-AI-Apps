@@ -57,6 +57,13 @@ if [ "$DEPLOYMENT_ENV" = "cloud" ]; then
         export PUBLIC_IP=$PUBLIC_IP
         export ENVIRONMENT=production
         export DEBUG=false
+        
+        # Set React environment variables for cloud
+        export REACT_APP_API_URL="http://$PUBLIC_IP:8000/api/v1"
+        export REACT_APP_BACKEND_URL="http://$PUBLIC_IP:8000"
+        export REACT_APP_AI_CHAT_URL="http://$PUBLIC_IP:8501"
+        export REACT_APP_DOCUMENT_ANALYSIS_URL="http://$PUBLIC_IP:8502"
+        export REACT_APP_WEB_SEARCH_URL="http://$PUBLIC_IP:8503"
     fi
     
     COMPOSE_FILE="docker-compose.prod.yml"
@@ -76,11 +83,28 @@ else
         export PUBLIC_IP=localhost
         export ENVIRONMENT=development
         export DEBUG=true
+        
+        # Set React environment variables for local
+        export REACT_APP_API_URL="http://localhost:8000/api/v1"
+        export REACT_APP_BACKEND_URL="http://localhost:8000"
+        export REACT_APP_AI_CHAT_URL="http://localhost:8501"
+        export REACT_APP_DOCUMENT_ANALYSIS_URL="http://localhost:8502"
+        export REACT_APP_WEB_SEARCH_URL="http://localhost:8503"
     fi
     
     COMPOSE_FILE="docker-compose.yml"
     echo "📦 Using development docker-compose configuration"
 fi
+
+# Display environment configuration
+echo ""
+echo "🔧 Environment Configuration:"
+echo "  - DEPLOYMENT_ENV: $DEPLOYMENT_ENV"
+echo "  - HOST_IP: $HOST_IP"
+echo "  - PUBLIC_IP: $PUBLIC_IP"
+echo "  - REACT_APP_API_URL: $REACT_APP_API_URL"
+echo "  - REACT_APP_BACKEND_URL: $REACT_APP_BACKEND_URL"
+echo ""
 
 # Check if .env file exists
 if [ ! -f .env ]; then
@@ -99,8 +123,8 @@ fi
 echo "🔨 Building and starting services with $COMPOSE_FILE..."
 
 if [ "$DEPLOYMENT_ENV" = "cloud" ]; then
-    # Production deployment
-    docker-compose -f $COMPOSE_FILE up --build -d
+    # Production deployment with explicit environment variables
+    PUBLIC_IP=$PUBLIC_IP docker-compose -f $COMPOSE_FILE up --build -d
 else
     # Development deployment
     docker-compose -f $COMPOSE_FILE up --build -d
@@ -108,7 +132,7 @@ fi
 
 # Wait for services to start
 echo "⏳ Waiting for services to start..."
-sleep 15
+sleep 20
 
 # Determine base URL for health checks
 if [ "$DEPLOYMENT_ENV" = "cloud" ]; then
@@ -152,6 +176,16 @@ else
     echo "❌ Web Search App is not responding"
 fi
 
+# Test environment configuration endpoint
+echo ""
+echo "🌍 Testing Environment Configuration:"
+if config_response=$(curl -s --max-time 10 "$BASE_URL:8000/api/v1/config" 2>/dev/null); then
+    echo "✅ Environment config endpoint is working"
+    echo "📋 Backend reports environment as: $(echo "$config_response" | grep -o '"deployment_env":"[^"]*"' | cut -d'"' -f4)"
+else
+    echo "⚠️  Environment config endpoint not responding"
+fi
+
 echo ""
 echo "🎉 Deployment complete!"
 echo ""
@@ -175,6 +209,8 @@ fi
 echo ""
 echo "📊 View logs: docker-compose -f $COMPOSE_FILE logs -f"
 echo "🛑 Stop services: docker-compose -f $COMPOSE_FILE down"
+echo ""
+echo "🧪 Run comprehensive tests: ./scripts/test-frontend-fixes.sh"
 
 # Clean up temporary files
 if [ -f .env.deploy ]; then
