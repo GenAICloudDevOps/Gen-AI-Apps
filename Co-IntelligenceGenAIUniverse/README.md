@@ -1,5 +1,6 @@
 # 🚀 Co-Intelligence GenAI Universe
 
+
 **Where Human Meets AI Intelligence - Now with Cloud Deployment Support**
 
 A modular, production-ready platform built with React, FastAPI, Streamlit, and AWS Bedrock - enabling rapid co-intelligence development through scalable architecture that works seamlessly in both local and cloud environments.
