@@ -112,69 +112,130 @@ A modular, production-ready platform built with React, FastAPI, Streamlit, and A
 ### Prerequisites
 - Docker & Docker Compose
 - AWS credentials (for AI features)
-- Python 3.8+ (for development scripts)
 - For EC2: Security Group with ports 3000, 8000, 8501-8503 open
 
 ### Environment Setup
 
-#### For Local Development:
-```bash
-# Copy local environment template
-cp .env.local .env
+#### Unified Environment Configuration:
+The platform uses a single `.env` file that works for both local and cloud deployments.
 
-# Edit with your AWS credentials
+```bash
+# Edit the .env file
 nano .env
+
+# 1. Add your AWS credentials:
+AWS_ACCESS_KEY_ID=your_access_key_here
+AWS_SECRET_ACCESS_KEY=your_secret_key_here
+
+# 2. Set PUBLIC_IP based on your deployment:
+# For Local Development: PUBLIC_IP=localhost
+# For Cloud/EC2 Deployment: PUBLIC_IP=your_ec2_public_ip
 ```
 
-#### For Cloud/EC2 Deployment:
-```bash
-# Copy cloud environment template
-cp .env.cloud .env
+### Deployment (Choose Your Method)
 
-# Edit with your AWS credentials and public IP
-nano .env
-# Replace YOUR_EC2_PUBLIC_IP_HERE with your actual EC2 public IP
-```
+Both deployment methods work with the same unified `.env` file:
 
-### Validate Setup
-```bash
-# Check if everything is configured correctly
-./scripts/validate-setup.sh
-```
+#### Method 1: Using Deploy Script (Recommended)
+**Features**: Environment detection, health checks, detailed logging, automatic validation
 
-### One-Command Deployment (Works Everywhere!)
+##### Local Development:
 ```bash
-# Deploy with automatic environment detection
+# 1. Set environment for local
+# In .env file: PUBLIC_IP=localhost
+
+# 2. Deploy using script
 ./scripts/deploy.sh
 
-# The script automatically detects:
-# - Local machine vs EC2 instance
-# - Public IP address (for EC2)
-# - Appropriate configuration files
-# - Environment-specific settings
-
-# Access points will be shown after deployment:
-# 🏠 Landing Page: http://localhost:3000 OR http://YOUR_EC2_IP:3000
-# 🤖 AI Chat: http://localhost:8501 OR http://YOUR_EC2_IP:8501
-# 📄 Document Analysis: http://localhost:8502 OR http://YOUR_EC2_IP:8502
-# 🔍 Web Search: http://localhost:8503 OR http://YOUR_EC2_IP:8503
-# 🔧 Backend API: http://localhost:8000 OR http://YOUR_EC2_IP:8000
-# 📚 API Docs: http://localhost:8000/docs OR http://YOUR_EC2_IP:8000/docs
+# 3. Access applications
+# Frontend: http://localhost:3000
+# AI Chat: http://localhost:8501
+# Document Analysis: http://localhost:8502
+# Web Search: http://localhost:8503
+# Backend API: http://localhost:8000
+# API Docs: http://localhost:8000/docs
 ```
 
-### Test Your Setup
+##### Cloud/EC2 Deployment:
 ```bash
-# Run comprehensive system tests (environment-aware)
+# 1. Set environment for cloud
+# In .env file: PUBLIC_IP=your_ec2_public_ip
+
+# 2. Deploy using script
+./scripts/deploy.sh
+
+# 3. Access applications
+# Frontend: http://your_ec2_ip:3000
+# AI Chat: http://your_ec2_ip:8501
+# Document Analysis: http://your_ec2_ip:8502
+# Web Search: http://your_ec2_ip:8503
+# Backend API: http://your_ec2_ip:8000
+# API Docs: http://your_ec2_ip:8000/docs
+```
+
+#### Method 2: Direct Docker Compose Commands
+**Features**: Faster execution, standard Docker workflow, direct control
+
+##### Local Development:
+```bash
+# 1. Set environment for local
+# In .env file: PUBLIC_IP=localhost
+
+# 2. Deploy directly
+docker-compose up -d --build
+
+# 3. Access applications (same URLs as Method 1)
+```
+
+##### Cloud/EC2 Deployment:
+```bash
+# 1. Set environment for cloud
+# In .env file: PUBLIC_IP=your_ec2_public_ip
+
+# 2. Deploy directly
+docker-compose -f docker-compose.prod.yml up -d --build
+
+# 3. Access applications (same URLs as Method 1)
+```
+
+### Management Commands
+
+#### Using Deploy Script:
+```bash
+# Deploy (works for both local and cloud based on .env setting)
+./scripts/deploy.sh
+
+# View comprehensive system status
 ./scripts/test-system.sh
 ```
 
-### Manual Deployment
-```bash
-# Local deployment
-docker-compose up --build -d
+#### Using Direct Docker Compose:
 
-# Cloud deployment (uses production configuration)
-docker-compose -f docker-compose.prod.yml up --build -d
+##### View Logs:
+```bash
+# Local
+docker-compose logs -f
+
+# Cloud
+docker-compose -f docker-compose.prod.yml logs -f
+```
+
+##### Stop Services:
+```bash
+# Local
+docker-compose down
+
+# Cloud
+docker-compose -f docker-compose.prod.yml down
+```
+
+##### Restart Services:
+```bash
+# Local
+docker-compose restart
+
+# Cloud
+docker-compose -f docker-compose.prod.yml restart
 ```
 
 ## 🛠️ Development
@@ -349,19 +410,17 @@ REACT_APP_AI_CHAT_URL=http://your-ec2-public-ip:8501
 
 ### Common Issues
 
-#### Environment Detection
+#### Environment Configuration
 ```bash
-# Check current environment
-./scripts/validate-setup.sh
+# Check current environment variables
+cat .env | grep PUBLIC_IP
 
-# Force local environment
-export DEPLOYMENT_ENV=local
-./scripts/deploy.sh
+# Verify Docker containers are running
+docker ps
 
-# Force cloud environment
-export DEPLOYMENT_ENV=cloud
-export PUBLIC_IP=your-ec2-ip
-./scripts/deploy.sh
+# Check container logs
+docker-compose logs -f  # Local
+docker-compose -f docker-compose.prod.yml logs -f  # Cloud
 ```
 
 #### Browser Cache (Most Common)
@@ -378,9 +437,13 @@ If changes don't appear after updates:
 #### Docker Issues
 ```bash
 # Reset Docker environment
-docker-compose down --volumes --remove-orphans
+docker-compose down --volumes --remove-orphans  # Local
+docker-compose -f docker-compose.prod.yml down --volumes --remove-orphans  # Cloud
+
+# Rebuild from scratch
 docker system prune -f
-./scripts/deploy.sh
+docker-compose up -d --build  # Local
+docker-compose -f docker-compose.prod.yml up -d --build  # Cloud
 ```
 
 #### Port Conflicts
@@ -429,39 +492,48 @@ MIT License - see LICENSE file for details
 ## 🎉 Quick Commands Summary
 
 ```bash
-# 🔍 Validate setup (environment-aware)
-./scripts/validate-setup.sh
+# 🔍 Check environment configuration
+cat .env | grep PUBLIC_IP
 
-# 🚀 Deploy everywhere (auto-detects environment)
+# 🚀 Deploy locally (Choose one method)
+# Method 1: Using deploy script
 ./scripts/deploy.sh
+# Method 2: Direct Docker Compose
+docker-compose up -d --build
 
-# 🧪 Test system (environment-aware)
-./scripts/test-system.sh
-
-# ➕ Create new environment-aware app
-./scripts/add-app.py "My App" "App description" --category utility
+# 🚀 Deploy on cloud (Choose one method)
+# Method 1: Using deploy script
+./scripts/deploy.sh
+# Method 2: Direct Docker Compose
+docker-compose -f docker-compose.prod.yml up -d --build
 
 # 📊 View logs
-docker-compose logs -f
+docker-compose logs -f                                    # Local
+docker-compose -f docker-compose.prod.yml logs -f        # Cloud
 
 # 🔄 Restart services
-docker-compose restart
+docker-compose restart                                    # Local
+docker-compose -f docker-compose.prod.yml restart        # Cloud
 
 # 🛑 Stop everything
-docker-compose down
+docker-compose down                                       # Local
+docker-compose -f docker-compose.prod.yml down           # Cloud
 
 # 🌍 Check environment
-curl http://localhost:8000/api/v1/config  # Local
-curl http://YOUR_EC2_IP:8000/api/v1/config  # Cloud
+curl http://localhost:8000/api/v1/config                 # Local
+curl http://YOUR_EC2_IP:8000/api/v1/config              # Cloud
+
+# 🧪 Test system (using deploy script features)
+./scripts/test-system.sh
 ```
 
 ## 🌟 New in Version 2.0
 
-- ✅ **Environment-Aware Deployment** - Automatic local/cloud detection
-- ✅ **Smart URL Configuration** - Dynamic endpoint management
-- ✅ **Enhanced Validation** - Comprehensive environment checking
+- ✅ **Unified Environment Configuration** - Single .env file for both local and cloud
+- ✅ **Simple Deployment Commands** - Direct Docker Compose commands
+- ✅ **Variable-Based URLs** - All URLs use PUBLIC_IP variable for easy switching
+- ✅ **Enhanced Frontend** - Environment-aware React application
 - ✅ **Cloud-Ready Apps** - All Streamlit apps support cloud deployment
 - ✅ **Production Optimization** - Separate configurations for dev/prod
-- ✅ **Auto-Configuration** - Zero-manual configuration for environment switching
+- ✅ **Simplified Workflow** - Just change PUBLIC_IP and deploy
 - ✅ **Enhanced Monitoring** - Environment-specific health checks and metrics
-- ✅ **Improved Documentation** - Complete deployment guides for both environments
