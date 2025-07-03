@@ -69,8 +69,8 @@ A modular, production-ready platform built with React, FastAPI, Streamlit, and A
 
 ### ☁️ Cloud Deployment (EC2)
 - **Perfect for:** Production, sharing, and scalable deployment
-- **Access:** http://YOUR_EC2_PUBLIC_IP:3000
-- **Configuration:** Automatic cloud detection and IP configuration
+- **Access:** http://your_ec2_ip:3000
+- **Configuration:** Set PUBLIC_IP in .env file
 - **Features:** Production optimization, auto-restart, security headers
 
 ## 📱 Available Apps
@@ -82,7 +82,7 @@ A modular, production-ready platform built with React, FastAPI, Streamlit, and A
 - **Status**: ✅ **Working** - Tested with AWS Bedrock
 - **Access**: 
   - Local: http://localhost:8501
-  - Cloud: http://YOUR_EC2_IP:8501
+  - Cloud: http://your_ec2_ip:8501
 
 ### 📄 Document Analysis
 - **Document upload** support (PDF, DOCX, TXT)
@@ -95,7 +95,7 @@ A modular, production-ready platform built with React, FastAPI, Streamlit, and A
 - **Status**: ✅ **Working** - Ready for document processing
 - **Access**: 
   - Local: http://localhost:8502
-  - Cloud: http://YOUR_EC2_IP:8502
+  - Cloud: http://your_ec2_ip:8502
 
 ### 🔍 Web Search
 - **AI-powered web search** using DuckDuckGo and AWS Bedrock
@@ -105,113 +105,83 @@ A modular, production-ready platform built with React, FastAPI, Streamlit, and A
 - **Status**: ✅ **Working** - Enhanced with rate limit handling
 - **Access**: 
   - Local: http://localhost:8503
-  - Cloud: http://YOUR_EC2_IP:8503
+  - Cloud: http://your_ec2_ip:8503
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Docker & Docker Compose
 - AWS credentials (for AI features)
-- For EC2: Security Group with ports 3000, 8000, 8501-8503 open
+- For EC2: Security Group with ports 22, 3000, 8000, 8501-8503 open
 
 ### Environment Setup
 
-#### Unified Environment Configuration:
-The platform uses a single `.env` file that works for both local and cloud deployments.
+The platform uses a **single `.env` file** that works for both local and cloud deployments.
 
 ```bash
-# Edit the .env file
+# 1. Edit the .env file
 nano .env
 
-# 1. Add your AWS credentials:
+# 2. Add your AWS credentials:
 AWS_ACCESS_KEY_ID=your_access_key_here
 AWS_SECRET_ACCESS_KEY=your_secret_key_here
 
-# 2. Set PUBLIC_IP based on your deployment:
+# 3. Set PUBLIC_IP based on your deployment:
 # For Local Development: PUBLIC_IP=localhost
 # For Cloud/EC2 Deployment: PUBLIC_IP=your_ec2_public_ip
 ```
 
-### Deployment (Choose Your Method)
+### Deployment
 
-Both deployment methods work with the same unified `.env` file:
+Choose your preferred deployment method. Both work with the same `.env` file:
 
 #### Method 1: Using Deploy Script (Recommended)
-**Features**: Environment detection, health checks, detailed logging, automatic validation
-
-##### Local Development:
 ```bash
-# 1. Set environment for local
-# In .env file: PUBLIC_IP=localhost
-
-# 2. Deploy using script
+# 1. Set PUBLIC_IP in .env file (localhost for local, your_ec2_ip for cloud)
+# 2. Run deployment script
 ./scripts/deploy.sh
 
-# 3. Access applications
-# Frontend: http://localhost:3000
-# AI Chat: http://localhost:8501
-# Document Analysis: http://localhost:8502
-# Web Search: http://localhost:8503
-# Backend API: http://localhost:8000
-# API Docs: http://localhost:8000/docs
+# The script automatically:
+# - Detects your environment (local/cloud)
+# - Uses appropriate Docker Compose file
+# - Provides health checks and validation
+# - Shows access URLs when complete
 ```
 
-##### Cloud/EC2 Deployment:
+#### Method 2: Direct Docker Compose
 ```bash
-# 1. Set environment for cloud
-# In .env file: PUBLIC_IP=your_ec2_public_ip
-
-# 2. Deploy using script
-./scripts/deploy.sh
-
-# 3. Access applications
-# Frontend: http://your_ec2_ip:3000
-# AI Chat: http://your_ec2_ip:8501
-# Document Analysis: http://your_ec2_ip:8502
-# Web Search: http://your_ec2_ip:8503
-# Backend API: http://your_ec2_ip:8000
-# API Docs: http://your_ec2_ip:8000/docs
-```
-
-#### Method 2: Direct Docker Compose Commands
-**Features**: Faster execution, standard Docker workflow, direct control
-
-##### Local Development:
-```bash
-# 1. Set environment for local
-# In .env file: PUBLIC_IP=localhost
-
-# 2. Deploy directly
+# For Local Development:
+# Set PUBLIC_IP=localhost in .env, then:
 docker-compose up -d --build
 
-# 3. Access applications (same URLs as Method 1)
-```
-
-##### Cloud/EC2 Deployment:
-```bash
-# 1. Set environment for cloud
-# In .env file: PUBLIC_IP=your_ec2_public_ip
-
-# 2. Deploy directly
+# For Cloud/EC2 Deployment:
+# Set PUBLIC_IP=your_ec2_ip in .env, then:
 docker-compose -f docker-compose.prod.yml up -d --build
-
-# 3. Access applications (same URLs as Method 1)
 ```
+
+### Access Your Applications
+
+After deployment, access your applications at:
+
+**Local Development (PUBLIC_IP=localhost):**
+- 🏠 Frontend: http://localhost:3000
+- 🤖 AI Chat: http://localhost:8501
+- 📄 Document Analysis: http://localhost:8502
+- 🔍 Web Search: http://localhost:8503
+- 🔧 Backend API: http://localhost:8000
+- 📚 API Docs: http://localhost:8000/docs
+
+**Cloud Deployment (PUBLIC_IP=your_ec2_ip):**
+- 🏠 Frontend: http://your_ec2_ip:3000
+- 🤖 AI Chat: http://your_ec2_ip:8501
+- 📄 Document Analysis: http://your_ec2_ip:8502
+- 🔍 Web Search: http://your_ec2_ip:8503
+- 🔧 Backend API: http://your_ec2_ip:8000
+- 📚 API Docs: http://your_ec2_ip:8000/docs
 
 ### Management Commands
 
-#### Using Deploy Script:
-```bash
-# Deploy (works for both local and cloud based on .env setting)
-./scripts/deploy.sh
-
-# View comprehensive system status
-./scripts/test-system.sh
-```
-
-#### Using Direct Docker Compose:
-
-##### View Logs:
+#### View Logs:
 ```bash
 # Local
 docker-compose logs -f
@@ -220,7 +190,7 @@ docker-compose logs -f
 docker-compose -f docker-compose.prod.yml logs -f
 ```
 
-##### Stop Services:
+#### Stop Services:
 ```bash
 # Local
 docker-compose down
@@ -229,7 +199,7 @@ docker-compose down
 docker-compose -f docker-compose.prod.yml down
 ```
 
-##### Restart Services:
+#### Restart Services:
 ```bash
 # Local
 docker-compose restart
@@ -242,52 +212,43 @@ docker-compose -f docker-compose.prod.yml restart
 
 ### Project Structure
 ```
-allapps/
-├── backend/                 # FastAPI backend with environment awareness
+Co-IntelligenceGenAIUniverse/
+├── backend/                 # FastAPI backend
 │   ├── app/
 │   │   ├── api/v1/         # API endpoints
 │   │   ├── services/       # Business logic (Bedrock service)
-│   │   └── main.py         # Environment-aware FastAPI app
-├── react-frontend/         # React landing page with dynamic configuration
-├── apps/                   # Environment-aware Streamlit applications
-│   ├── ai_chat.py         # AI Chat app with environment detection
-│   ├── document_analysis.py # Document analysis with cloud support
-│   └── web_search.py      # Web Search with environment awareness
-├── config/                # Configuration management
-│   └── apps.json          # Dynamic app registry with environment support
-├── scripts/               # Enhanced automation scripts
-│   ├── deploy.sh          # Smart environment-aware deployment
-│   ├── add-app.py         # Environment-aware app creation
-│   ├── validate-setup.sh  # Comprehensive validation for both environments
-│   └── test-system.sh     # Environment-aware system testing
-├── docker-compose.yml     # Development container orchestration
-├── docker-compose.prod.yml # Production container orchestration
-├── .env.local            # Local development configuration
-├── .env.cloud            # Cloud deployment configuration
-└── .env.example          # Environment template
+│   │   └── main.py         # FastAPI application
+├── react-frontend/         # React landing page
+├── apps/                   # Streamlit applications
+│   ├── ai_chat.py         # AI Chat app
+│   ├── document_analysis.py # Document analysis
+│   └── web_search.py      # Web Search
+├── config/                # Configuration files
+│   └── apps.json          # App registry
+├── scripts/               # Automation scripts
+│   ├── deploy.sh          # Deployment script
+│   ├── add-app.py         # App creation
+│   └── test-system.sh     # System testing
+├── docker-compose.yml     # Development configuration
+├── docker-compose.prod.yml # Production configuration
+└── .env                   # Unified environment configuration
 ```
 
 ## ➕ Adding New Apps
 
-### Automated App Creation (Recommended)
+### Automated App Creation
 ```bash
-# Create environment-aware apps with full integration
+# Create new apps with full integration
 ./scripts/add-app.py "Weather App" "Weather forecasting with AI" --category utility
 
 # The new app will automatically include:
-# - Environment detection (local/cloud)
-# - Dynamic URL configuration
-# - Backend connectivity testing
-# - Environment-specific features
+# - Complete Streamlit app template
+# - Docker service configuration
+# - Apps.json configuration update
+# - Health checks and networking
+# - Automatic port assignment
+# - React frontend integration
 ```
-
-### What Gets Created Automatically:
-- ✅ Complete Streamlit app template with environment awareness
-- ✅ Docker service configuration for both local and cloud
-- ✅ Apps.json configuration update with environment support
-- ✅ Health checks and networking for both environments
-- ✅ Automatic port assignment
-- ✅ React frontend integration with dynamic URLs
 
 ## 🎨 Enhanced Frontend Features
 
@@ -331,7 +292,7 @@ allapps/
 ## 🌍 Cloud Deployment Guide
 
 ### EC2 Setup
-1. **Launch EC2 Instance** (Ubuntu 20.04+ recommended)
+1. **Launch EC2 Instance** (Amazon Linux 2 or RHEL/CentOS recommended)
 2. **Configure Security Group:**
    ```
    Port 22   (SSH)          - Your IP
@@ -345,16 +306,20 @@ allapps/
 3. **Install Dependencies:**
    ```bash
    # Update system
-   sudo apt update && sudo apt upgrade -y
+   sudo yum update -y
    
    # Install Docker
-   curl -fsSL https://get.docker.com -o get-docker.sh
-   sudo sh get-docker.sh
+   sudo yum install -y docker
+   sudo systemctl start docker
+   sudo systemctl enable docker
    sudo usermod -aG docker $USER
    
    # Install Docker Compose
    sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
    sudo chmod +x /usr/local/bin/docker-compose
+   
+   # Install Git
+   sudo yum install -y git
    
    # Logout and login again for Docker group changes
    ```
@@ -363,19 +328,21 @@ allapps/
    ```bash
    # Clone your repository
    git clone <your-repo-url>
-   cd allapps
+   cd Co-IntelligenceGenAIUniverse
    
    # Setup environment
-   cp .env.cloud .env
-   # Edit .env with your AWS credentials and EC2 public IP
+   nano .env
+   # Set PUBLIC_IP=your_ec2_public_ip and add AWS credentials
    
-   # Deploy (automatic environment detection)
+   # Deploy
    ./scripts/deploy.sh
+   # OR
+   docker-compose -f docker-compose.prod.yml up -d --build
    ```
 
 ### Environment Variables for Cloud
 ```bash
-# Cloud-specific configuration
+# Cloud-specific configuration in .env file
 DEPLOYMENT_ENV=cloud
 HOST_IP=0.0.0.0
 PUBLIC_IP=your-ec2-public-ip
@@ -387,10 +354,11 @@ AWS_DEFAULT_REGION=us-east-1
 AWS_ACCESS_KEY_ID=your_access_key
 AWS_SECRET_ACCESS_KEY=your_secret_key
 
-# Dynamic URLs (automatically configured)
-REACT_APP_API_URL=http://your-ec2-public-ip:8000/api/v1
-REACT_APP_AI_CHAT_URL=http://your-ec2-public-ip:8501
-# ... etc
+# Dynamic URLs (automatically configured using PUBLIC_IP variable)
+REACT_APP_API_URL=http://${PUBLIC_IP}:8000/api/v1
+REACT_APP_AI_CHAT_URL=http://${PUBLIC_IP}:8501
+REACT_APP_DOCUMENT_ANALYSIS_URL=http://${PUBLIC_IP}:8502
+REACT_APP_WEB_SEARCH_URL=http://${PUBLIC_IP}:8503
 ```
 
 ## 📊 Platform Benefits
@@ -475,10 +443,10 @@ curl -X POST http://localhost:8000/api/v1/bedrock/chat \
 # Ensure ports 3000, 8000, 8501-8503 are open to 0.0.0.0/0
 
 # Check if services are running
-curl http://YOUR_EC2_IP:8000/health
+curl http://your_ec2_ip:8000/health
 
 # Check environment configuration
-curl http://YOUR_EC2_IP:8000/api/v1/config
+curl http://your_ec2_ip:8000/api/v1/config
 ```
 
 ## 📄 License
@@ -521,7 +489,7 @@ docker-compose -f docker-compose.prod.yml down           # Cloud
 
 # 🌍 Check environment
 curl http://localhost:8000/api/v1/config                 # Local
-curl http://YOUR_EC2_IP:8000/api/v1/config              # Cloud
+curl http://your_ec2_ip:8000/api/v1/config              # Cloud
 
 # 🧪 Test system (using deploy script features)
 ./scripts/test-system.sh
@@ -530,8 +498,8 @@ curl http://YOUR_EC2_IP:8000/api/v1/config              # Cloud
 ## 🌟 New in Version 2.0
 
 - ✅ **Unified Environment Configuration** - Single .env file for both local and cloud
-- ✅ **Simple Deployment Commands** - Direct Docker Compose commands
 - ✅ **Variable-Based URLs** - All URLs use PUBLIC_IP variable for easy switching
+- ✅ **Dual Deployment Methods** - Deploy script or direct Docker Compose commands
 - ✅ **Enhanced Frontend** - Environment-aware React application
 - ✅ **Cloud-Ready Apps** - All Streamlit apps support cloud deployment
 - ✅ **Production Optimization** - Separate configurations for dev/prod
