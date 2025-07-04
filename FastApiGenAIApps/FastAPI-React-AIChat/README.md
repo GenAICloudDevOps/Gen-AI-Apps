@@ -7,7 +7,11 @@ A **stunning, modern chat application** with an animated React frontend that com
 - **🔧 API Backend**: http://localhost:8000
 - **📚 API Documentation**: http://localhost:8000/docs
 
-## 📸 **Screenshots**
+## 🎥 **Demo Video & Screenshots**
+
+### 🎬 **Live Demo Video**
+https://github.com/user-attachments/assets/0.mov
+*Watch the AI Chat Assistant in action with beautiful animations and real-time responses*
 
 ### 🎨 **Beautiful Chat Interface**
 ![Chat Application Screenshot 1](screenshots/1.png)
@@ -27,7 +31,8 @@ FastapiReact/
 ├── 📄 .dockerignore               # Docker ignore rules
 ├── 📄 docker-compose.yml          # Docker orchestration
 │
-├── 📸 screenshots/                # Application screenshots
+├── 📸 screenshots/                # Application screenshots & demo video
+│   ├── 📄 0.mov                   # Live demo video
 │   ├── 📄 1.png                   # Main chat interface screenshot
 │   └── 📄 2.png                   # FastAPI Swagger UI screenshot
 │
