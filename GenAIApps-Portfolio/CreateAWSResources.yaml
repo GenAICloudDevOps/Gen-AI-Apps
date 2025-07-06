@@ -591,30 +591,28 @@ Outputs:
     Export:
       Name: !Sub '${EnvironmentName}-Region'
 
-  # Security Warning
+  # Security Notice
   SecurityNotice:
     Description: Important security information
     Value: !Sub |
       SECURITY NOTICE:
-      - The Secret Access Key is displayed in CloudFormation outputs
-      - Copy these credentials immediately and store them securely
-      - Consider rotating the access key after initial setup
+      - Create AWS Access Keys manually for the IAM user: ${EC2AdminUser}
+      - Go to AWS Console > IAM > Users > ${EC2AdminUser} > Security credentials
+      - Click "Create access key" and store credentials securely
       - Never commit these credentials to version control
-      
-      Access Key ID: ${EC2UserAccessKey}
-      Secret Access Key: ${EC2UserAccessKey.SecretAccessKey}
+      - Use the manually created keys in your .env file
 
   # Complete Environment file template with actual values
   EnvironmentVariables:
     Description: Complete .env file configuration with actual values
     Value: !Sub |
-      # AWS Configuration - READY TO USE
+      # AWS Configuration - ADD YOUR MANUAL ACCESS KEYS
       S3_BUCKET_NAME="${MyS3Bucket}"
       S3_FOLDER_APP1=App1_RAG-DocuMind/
       S3_FOLDER_APP2=App2_PromptEng/
       S3_FOLDER_APP3=App3_Nist-AI-RMF/
-      AWS_ACCESS_KEY="${EC2UserAccessKey}"
-      AWS_SECRET_KEY="${EC2UserAccessKey.SecretAccessKey}"
+      AWS_ACCESS_KEY="<YOUR_MANUAL_ACCESS_KEY>"
+      AWS_SECRET_KEY="<YOUR_MANUAL_SECRET_KEY>"
       AWS_REGION="${AWS::Region}"
       
       # Database Configuration - READY TO USE
@@ -637,20 +635,28 @@ Outputs:
     Value: !Sub |
       DEPLOYMENT INSTRUCTIONS:
       
-      1. COPY ENVIRONMENT VARIABLES:
+      1. CREATE AWS ACCESS KEYS MANUALLY:
+         - Go to AWS Console > IAM > Users > ${EC2AdminUser}
+         - Click "Security credentials" tab
+         - Click "Create access key" > Choose "Application running outside AWS"
+         - Copy the Access Key ID and Secret Access Key
+      
+      2. COPY ENVIRONMENT VARIABLES:
          Copy the 'EnvironmentVariables' output to your .env file
       
-      2. ADD MISTRAL API KEY:
-         Get your API key from https://console.mistral.ai/
-         Replace <YOUR_MISTRAL_API_KEY> in the .env file
+      3. ADD API KEYS:
+         - Replace <YOUR_MANUAL_ACCESS_KEY> with your AWS Access Key ID
+         - Replace <YOUR_MANUAL_SECRET_KEY> with your AWS Secret Access Key
+         - Get Mistral API key from https://console.mistral.ai/
+         - Replace <YOUR_MISTRAL_API_KEY> in the .env file
       
-      3. CONNECT TO EC2:
+      4. CONNECT TO EC2:
          ssh -i "your-key.pem" ec2-user@${MyEC2Instance.PublicIp}
       
-      4. DEPLOY APPLICATIONS:
+      5. DEPLOY APPLICATIONS:
          Upload your code and run: docker-compose up -d
       
-      5. ACCESS APPLICATIONS:
+      6. ACCESS APPLICATIONS:
          React Frontend: http://${MyEC2Instance.PublicIp}:3000
          RAG-DocuMind: http://${MyEC2Instance.PublicIp}:8501
          Prompt Engineering: http://${MyEC2Instance.PublicIp}:8502
