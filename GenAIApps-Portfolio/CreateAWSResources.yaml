@@ -256,6 +256,100 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
 
+  # Lambda execution role for S3 folder creation
+  S3FolderCreationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: S3FolderCreationPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:PutObjectAcl
+                Resource: !Sub '${MyS3Bucket}/*'
+
+  # Lambda function to create S3 folders
+  S3FolderCreationFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${EnvironmentName}-s3-folder-creator'
+      Runtime: python3.9
+      Handler: index.lambda_handler
+      Role: !GetAtt S3FolderCreationRole.Arn
+      Timeout: 60
+      Code:
+        ZipFile: |
+          import boto3
+          import cfnresponse
+          import json
+          
+          def lambda_handler(event, context):
+              try:
+                  s3_client = boto3.client('s3')
+                  bucket_name = event['ResourceProperties']['BucketName']
+                  folders = event['ResourceProperties']['Folders']
+                  
+                  if event['RequestType'] == 'Create' or event['RequestType'] == 'Update':
+                      # Create folders by putting empty objects with trailing slash
+                      for folder in folders:
+                          folder_key = folder if folder.endswith('/') else folder + '/'
+                          s3_client.put_object(
+                              Bucket=bucket_name,
+                              Key=folder_key,
+                              Body=b'',
+                              ContentType='application/x-directory'
+                          )
+                          print(f"Created folder: {folder_key}")
+                      
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, {
+                          'Message': f'Successfully created {len(folders)} folders in bucket {bucket_name}'
+                      })
+                  
+                  elif event['RequestType'] == 'Delete':
+                      # Optionally clean up folders on stack deletion
+                      # Note: This will only delete empty folder markers, not actual files
+                      for folder in folders:
+                          folder_key = folder if folder.endswith('/') else folder + '/'
+                          try:
+                              s3_client.delete_object(Bucket=bucket_name, Key=folder_key)
+                              print(f"Deleted folder marker: {folder_key}")
+                          except Exception as e:
+                              print(f"Could not delete folder marker {folder_key}: {str(e)}")
+                      
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, {
+                          'Message': 'Folder cleanup completed'
+                      })
+                  
+              except Exception as e:
+                  print(f"Error: {str(e)}")
+                  cfnresponse.send(event, context, cfnresponse.FAILED, {
+                      'Message': f'Error creating S3 folders: {str(e)}'
+                  })
+
+  # Custom resource to trigger S3 folder creation
+  S3FolderCreation:
+    Type: AWS::CloudFormation::CustomResource
+    DependsOn: MyS3Bucket
+    Properties:
+      ServiceToken: !GetAtt S3FolderCreationFunction.Arn
+      BucketName: !Ref MyS3Bucket
+      Folders:
+        - 'App1_RAG-DocuMind'
+        - 'App2_PromptEng'
+        - 'App3_Nist-AI-RMF'
+
   # EC2 Security Group with restricted access
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -344,23 +438,102 @@ Outputs:
   VPCId:
     Description: VPC ID
     Value: !Ref MyVPC
+    Export:
+      Name: !Sub '${EnvironmentName}-VPC-ID'
 
   IAMUserName:
     Description: Name of the IAM user created
     Value: !Ref EC2AdminUser
+    Export:
+      Name: !Sub '${EnvironmentName}-IAM-User'
 
   EC2InstanceId:
     Description: ID of the EC2 instance
     Value: !Ref MyEC2Instance
+    Export:
+      Name: !Sub '${EnvironmentName}-EC2-Instance-ID'
+
+  EC2PublicIP:
+    Description: Public IP address of the EC2 instance
+    Value: !GetAtt MyEC2Instance.PublicIp
+    Export:
+      Name: !Sub '${EnvironmentName}-EC2-Public-IP'
 
   S3BucketName:
     Description: Name of the S3 bucket
     Value: !Ref MyS3Bucket
+    Export:
+      Name: !Sub '${EnvironmentName}-S3-Bucket'
+
+  S3BucketFolders:
+    Description: S3 bucket folders created for applications
+    Value: !Join 
+      - ', '
+      - - 'App1_RAG-DocuMind/'
+        - 'App2_PromptEng/'
+        - 'App3_Nist-AI-RMF/'
+    Export:
+      Name: !Sub '${EnvironmentName}-S3-Folders'
 
   DatabaseEndpoint:
     Description: Endpoint of the PostgreSQL database
     Value: !GetAtt PostgreSQLDatabase.Endpoint.Address
+    Export:
+      Name: !Sub '${EnvironmentName}-DB-Endpoint'
+
+  DatabasePort:
+    Description: Port of the PostgreSQL database
+    Value: !GetAtt PostgreSQLDatabase.Endpoint.Port
+    Export:
+      Name: !Sub '${EnvironmentName}-DB-Port'
+
+  DatabaseName:
+    Description: Name of the PostgreSQL database
+    Value: !Ref DBName
+    Export:
+      Name: !Sub '${EnvironmentName}-DB-Name'
+
+  DatabaseUsername:
+    Description: Username for the PostgreSQL database
+    Value: postgres
+    Export:
+      Name: !Sub '${EnvironmentName}-DB-Username'
 
   KeyPairName:
     Description: Name of the key pair
     Value: !Ref KeyPairName
+    Export:
+      Name: !Sub '${EnvironmentName}-KeyPair'
+
+  AWSRegion:
+    Description: AWS Region where resources are created
+    Value: !Ref 'AWS::Region'
+    Export:
+      Name: !Sub '${EnvironmentName}-Region'
+
+  # Environment file template
+  EnvironmentVariables:
+    Description: Template for .env file configuration
+    Value: !Sub |
+      # AWS Configuration (Update these values)
+      S3_BUCKET_NAME="${MyS3Bucket}"
+      S3_FOLDER_APP1=App1_RAG-DocuMind/
+      S3_FOLDER_APP2=App2_PromptEng/
+      S3_FOLDER_APP3=App3_Nist-AI-RMF/
+      AWS_ACCESS_KEY="<GET_FROM_IAM_CONSOLE>"
+      AWS_SECRET_KEY="<GET_FROM_IAM_CONSOLE>"
+      AWS_REGION="${AWS::Region}"
+      
+      # Database Configuration
+      POSTGRES_HOST="${PostgreSQLDatabase.Endpoint.Address}"
+      POSTGRES_PORT="${PostgreSQLDatabase.Endpoint.Port}"
+      POSTGRES_DB="${DBName}"
+      POSTGRES_USER="postgres"
+      POSTGRES_PASSWORD="postgres"
+      
+      # External API (Get from Mistral AI)
+      MISTRAL_API_KEY="<YOUR_MISTRAL_API_KEY>"
+      
+      # React Environment Variables
+      EC2_PUBLIC_IP="${MyEC2Instance.PublicIp}"
+      API_BASE_URL="http://${MyEC2Instance.PublicIp}"

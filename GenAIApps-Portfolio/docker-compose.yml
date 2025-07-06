@@ -1,50 +1,141 @@
-version: '3'
+version: '3.8'
+
+networks:
+  genai-network:
+    driver: bridge
+
 services:
+  # React Frontend Application
+  react-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.react
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_EC2_IP=${EC2_PUBLIC_IP:-localhost}
+      - REACT_APP_API_BASE_URL=${API_BASE_URL:-http://localhost}
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - /app/node_modules
+    networks:
+      - genai-network
+    depends_on:
+      - streamlit-app1-rag-documind
+      - streamlit-app2-prompteng
+      - streamlit-app3-nist-ai-rmf
+      - streamlit-app4-multiagentcrewai
+      - chainlit-app5-conversationalai
+      - streamlit-app6-interpretexplainai
+    restart: unless-stopped
+
+  # Python/Streamlit Applications
   streamlit-app1-rag-documind:
-    build: .
-    command: streamlit run App1-RAG-DocuMind.py --server.port 8501
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: streamlit run App1-RAG-DocuMind.py --server.port 8501 --server.address 0.0.0.0
     ports:
       - "8501:8501"
     env_file:
       - .env
+    networks:
+      - genai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   streamlit-app2-prompteng:
-    build: .
-    command: streamlit run App2-PromptEng.py --server.port 8502
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: streamlit run App2-PromptEng.py --server.port 8502 --server.address 0.0.0.0
     ports:
       - "8502:8502"
     env_file:
       - .env
+    networks:
+      - genai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8502"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   streamlit-app3-nist-ai-rmf:
-    build: .
-    command: streamlit run App3-Nist-AI-RMF.py --server.port 8503
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: streamlit run App3-Nist-AI-RMF.py --server.port 8503 --server.address 0.0.0.0
     ports:
       - "8503:8503"
     env_file:
       - .env
+    networks:
+      - genai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8503"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   streamlit-app4-multiagentcrewai:
-    build: .
-    command: streamlit run App4-MultiAgentCrewAI.py --server.port 8504
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: streamlit run App4-MultiAgentCrewAI.py --server.port 8504 --server.address 0.0.0.0
     ports:
       - "8504:8504"
     env_file:
       - .env
+    networks:
+      - genai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8504"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   chainlit-app5-conversationalai:
-    build: .
-    command: chainlit run App5-ConversationalAI-Chainlit.py --port 8000
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: chainlit run App5-ConversationalAI-Chainlit.py --port 8000 --host 0.0.0.0
     ports:
       - "8000:8000"
     env_file:
       - .env
+    networks:
+      - genai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   streamlit-app6-interpretexplainai:
-    build: .
-    command: streamlit run App6-InterpretExplainAI.py --server.port 8506
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: streamlit run App6-InterpretExplainAI.py --server.port 8506 --server.address 0.0.0.0
     ports:
       - "8506:8506"
     env_file:
       - .env
+    networks:
+      - genai-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8506"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
