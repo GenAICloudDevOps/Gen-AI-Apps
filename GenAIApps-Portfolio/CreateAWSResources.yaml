@@ -244,6 +244,7 @@ Resources:
   # S3 Access Policy for ec2-user
   EC2UserS3Policy:
     Type: AWS::IAM::Policy
+    DependsOn: MyS3Bucket
     Properties:
       PolicyName: !Sub '${EnvironmentName}-EC2User-S3-Access-Policy'
       PolicyDocument:
@@ -260,8 +261,8 @@ Resources:
               - s3:ListMultipartUploadParts
               - s3:AbortMultipartUpload
             Resource:
-              - !Sub '${MyS3Bucket.Arn}/*'
-              - !Ref MyS3Bucket.Arn
+              - !Sub 'arn:aws:s3:::${MyS3Bucket}/*'
+              - !Sub 'arn:aws:s3:::${MyS3Bucket}'
           - Effect: Allow
             Action:
               - s3:ListAllMyBuckets
@@ -344,6 +345,7 @@ Resources:
   # Lambda execution role for S3 folder creation
   S3FolderCreationRole:
     Type: AWS::IAM::Role
+    DependsOn: MyS3Bucket
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -363,7 +365,7 @@ Resources:
                 Action:
                   - s3:PutObject
                   - s3:PutObjectAcl
-                Resource: !Sub '${MyS3Bucket.Arn}/*'
+                Resource: !Sub 'arn:aws:s3:::${MyS3Bucket}/*'
 
   # Lambda function to create S3 folders
   S3FolderCreationFunction:
