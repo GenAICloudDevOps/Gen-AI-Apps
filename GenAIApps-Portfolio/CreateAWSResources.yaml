@@ -318,13 +318,6 @@ Resources:
       Users:
         - !Ref EC2AdminUser
 
-  # Create Access Key for ec2-user
-  EC2UserAccessKey:
-    Type: AWS::IAM::AccessKey
-    Properties:
-      UserName: !Ref EC2AdminUser
-      Status: Active
-
   # S3 Bucket with improved security
   MyS3Bucket:
     Type: AWS::S3::Bucket
@@ -533,18 +526,6 @@ Outputs:
     Value: !Ref EC2AdminUser
     Export:
       Name: !Sub '${EnvironmentName}-IAM-User'
-
-  IAMUserAccessKey:
-    Description: Access Key ID for ec2-user
-    Value: !Ref EC2UserAccessKey
-    Export:
-      Name: !Sub '${EnvironmentName}-Access-Key-ID'
-
-  IAMUserSecretKey:
-    Description: Secret Access Key for ec2-user (Handle with care!)
-    Value: !GetAtt EC2UserAccessKey.SecretAccessKey
-    Export:
-      Name: !Sub '${EnvironmentName}-Secret-Access-Key'
 
   EC2InstanceId:
     Description: ID of the EC2 instance
