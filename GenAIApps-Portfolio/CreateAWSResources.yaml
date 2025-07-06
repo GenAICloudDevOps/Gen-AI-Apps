@@ -229,15 +229,58 @@ Resources:
       SubnetId: !Ref PrivateSubnet2
       RouteTableId: !Ref PrivateRouteTable
 
-  # IAM User with specific permissions
-  EC2AdminUser:
-    Type: AWS::IAM::User
+  # IAM Policies for existing cloud_user
+  CloudUserS3Policy:
+    Type: AWS::IAM::Policy
     Properties:
-      UserName: ec2-user
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
-        - arn:aws:iam::aws:policy/AmazonS3FullAccess
-        - arn:aws:iam::aws:policy/AmazonRDSFullAccess
+      PolicyName: !Sub '${EnvironmentName}-S3-Access-Policy'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+              - s3:DeleteObject
+              - s3:ListBucket
+            Resource:
+              - !Sub '${MyS3Bucket}/*'
+              - !GetAtt MyS3Bucket.Arn
+      Users:
+        - cloud_user
+
+  CloudUserRDSPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub '${EnvironmentName}-RDS-Access-Policy'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - rds:DescribeDBInstances
+              - rds:DescribeDBClusters
+              - rds:ListTagsForResource
+            Resource: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:${PostgreSQLDatabase}'
+      Users:
+        - cloud_user
+
+  CloudUserEC2Policy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub '${EnvironmentName}-EC2-Access-Policy'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - ec2:DescribeInstances
+              - ec2:DescribeSecurityGroups
+              - ec2:DescribeVpcs
+              - ec2:DescribeSubnets
+            Resource: '*'
+      Users:
+        - cloud_user
 
   # S3 Bucket with improved security
   MyS3Bucket:
@@ -441,9 +484,9 @@ Outputs:
     Export:
       Name: !Sub '${EnvironmentName}-VPC-ID'
 
-  IAMUserName:
-    Description: Name of the IAM user created
-    Value: !Ref EC2AdminUser
+  ExistingIAMUser:
+    Description: Existing IAM user with attached policies
+    Value: cloud_user
     Export:
       Name: !Sub '${EnvironmentName}-IAM-User'
 
@@ -511,17 +554,34 @@ Outputs:
     Export:
       Name: !Sub '${EnvironmentName}-Region'
 
+  # Instructions for cloud_user access keys
+  AccessKeyInstructions:
+    Description: Instructions to get access keys for cloud_user
+    Value: !Sub |
+      To get access keys for cloud_user, run these commands:
+      
+      1. List existing access keys:
+         aws iam list-access-keys --user-name cloud_user
+      
+      2. Create new access key (if needed):
+         aws iam create-access-key --user-name cloud_user
+      
+      3. The policies attached to cloud_user provide access to:
+         - S3 bucket: ${MyS3Bucket}
+         - RDS instance: ${PostgreSQLDatabase}
+         - EC2 describe permissions
+
   # Environment file template
   EnvironmentVariables:
     Description: Template for .env file configuration
     Value: !Sub |
-      # AWS Configuration (Update these values)
+      # AWS Configuration (Update ACCESS_KEY and SECRET_KEY)
       S3_BUCKET_NAME="${MyS3Bucket}"
       S3_FOLDER_APP1=App1_RAG-DocuMind/
       S3_FOLDER_APP2=App2_PromptEng/
       S3_FOLDER_APP3=App3_Nist-AI-RMF/
-      AWS_ACCESS_KEY="<GET_FROM_IAM_CONSOLE>"
-      AWS_SECRET_KEY="<GET_FROM_IAM_CONSOLE>"
+      AWS_ACCESS_KEY="<GET_FROM_CLOUD_USER_ACCESS_KEYS>"
+      AWS_SECRET_KEY="<GET_FROM_CLOUD_USER_ACCESS_KEYS>"
       AWS_REGION="${AWS::Region}"
       
       # Database Configuration
