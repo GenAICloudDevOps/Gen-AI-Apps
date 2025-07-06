@@ -229,11 +229,23 @@ Resources:
       SubnetId: !Ref PrivateSubnet2
       RouteTableId: !Ref PrivateRouteTable
 
-  # IAM Policies for existing cloud_user
-  CloudUserS3Policy:
+  # Create IAM User ec2-user
+  EC2AdminUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: ec2-user
+      Path: /
+      Tags:
+        - Key: Environment
+          Value: !Ref EnvironmentName
+        - Key: Purpose
+          Value: GenAI-Apps-Portfolio
+
+  # S3 Access Policy for ec2-user
+  EC2UserS3Policy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: !Sub '${EnvironmentName}-S3-Access-Policy'
+      PolicyName: !Sub '${EnvironmentName}-EC2User-S3-Access-Policy'
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -243,16 +255,25 @@ Resources:
               - s3:PutObject
               - s3:DeleteObject
               - s3:ListBucket
+              - s3:GetBucketLocation
+              - s3:ListBucketMultipartUploads
+              - s3:ListMultipartUploadParts
+              - s3:AbortMultipartUpload
             Resource:
               - !Sub '${MyS3Bucket}/*'
               - !GetAtt MyS3Bucket.Arn
+          - Effect: Allow
+            Action:
+              - s3:ListAllMyBuckets
+            Resource: '*'
       Users:
-        - cloud_user
+        - !Ref EC2AdminUser
 
-  CloudUserRDSPolicy:
+  # RDS Access Policy for ec2-user
+  EC2UserRDSPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: !Sub '${EnvironmentName}-RDS-Access-Policy'
+      PolicyName: !Sub '${EnvironmentName}-EC2User-RDS-Access-Policy'
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -260,27 +281,48 @@ Resources:
             Action:
               - rds:DescribeDBInstances
               - rds:DescribeDBClusters
+              - rds:DescribeDBSubnetGroups
+              - rds:DescribeDBParameterGroups
+              - rds:DescribeDBClusterParameterGroups
               - rds:ListTagsForResource
-            Resource: !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:${PostgreSQLDatabase}'
+            Resource: 
+              - !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:db:*'
+              - !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster:*'
+              - !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:subgrp:*'
+              - !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:pg:*'
+              - !Sub 'arn:aws:rds:${AWS::Region}:${AWS::AccountId}:cluster-pg:*'
       Users:
-        - cloud_user
+        - !Ref EC2AdminUser
 
-  CloudUserEC2Policy:
+  # EC2 Access Policy for ec2-user
+  EC2UserEC2Policy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: !Sub '${EnvironmentName}-EC2-Access-Policy'
+      PolicyName: !Sub '${EnvironmentName}-EC2User-EC2-Access-Policy'
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Action:
               - ec2:DescribeInstances
+              - ec2:DescribeInstanceStatus
               - ec2:DescribeSecurityGroups
               - ec2:DescribeVpcs
               - ec2:DescribeSubnets
+              - ec2:DescribeKeyPairs
+              - ec2:DescribeImages
+              - ec2:DescribeAvailabilityZones
+              - ec2:DescribeRegions
             Resource: '*'
       Users:
-        - cloud_user
+        - !Ref EC2AdminUser
+
+  # Create Access Key for ec2-user
+  EC2UserAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref EC2AdminUser
+      Status: Active
 
   # S3 Bucket with improved security
   MyS3Bucket:
@@ -484,11 +526,23 @@ Outputs:
     Export:
       Name: !Sub '${EnvironmentName}-VPC-ID'
 
-  ExistingIAMUser:
-    Description: Existing IAM user with attached policies
-    Value: cloud_user
+  IAMUserName:
+    Description: Name of the IAM user created
+    Value: !Ref EC2AdminUser
     Export:
       Name: !Sub '${EnvironmentName}-IAM-User'
+
+  IAMUserAccessKey:
+    Description: Access Key ID for ec2-user
+    Value: !Ref EC2UserAccessKey
+    Export:
+      Name: !Sub '${EnvironmentName}-Access-Key-ID'
+
+  IAMUserSecretKey:
+    Description: Secret Access Key for ec2-user (Handle with care!)
+    Value: !GetAtt EC2UserAccessKey.SecretAccessKey
+    Export:
+      Name: !Sub '${EnvironmentName}-Secret-Access-Key'
 
   EC2InstanceId:
     Description: ID of the EC2 instance
@@ -554,37 +608,33 @@ Outputs:
     Export:
       Name: !Sub '${EnvironmentName}-Region'
 
-  # Instructions for cloud_user access keys
-  AccessKeyInstructions:
-    Description: Instructions to get access keys for cloud_user
+  # Security Warning
+  SecurityNotice:
+    Description: Important security information
     Value: !Sub |
-      To get access keys for cloud_user, run these commands:
+      SECURITY NOTICE:
+      - The Secret Access Key is displayed in CloudFormation outputs
+      - Copy these credentials immediately and store them securely
+      - Consider rotating the access key after initial setup
+      - Never commit these credentials to version control
       
-      1. List existing access keys:
-         aws iam list-access-keys --user-name cloud_user
-      
-      2. Create new access key (if needed):
-         aws iam create-access-key --user-name cloud_user
-      
-      3. The policies attached to cloud_user provide access to:
-         - S3 bucket: ${MyS3Bucket}
-         - RDS instance: ${PostgreSQLDatabase}
-         - EC2 describe permissions
+      Access Key ID: ${EC2UserAccessKey}
+      Secret Access Key: ${EC2UserAccessKey.SecretAccessKey}
 
-  # Environment file template
+  # Complete Environment file template with actual values
   EnvironmentVariables:
-    Description: Template for .env file configuration
+    Description: Complete .env file configuration with actual values
     Value: !Sub |
-      # AWS Configuration (Update ACCESS_KEY and SECRET_KEY)
+      # AWS Configuration - READY TO USE
       S3_BUCKET_NAME="${MyS3Bucket}"
       S3_FOLDER_APP1=App1_RAG-DocuMind/
       S3_FOLDER_APP2=App2_PromptEng/
       S3_FOLDER_APP3=App3_Nist-AI-RMF/
-      AWS_ACCESS_KEY="<GET_FROM_CLOUD_USER_ACCESS_KEYS>"
-      AWS_SECRET_KEY="<GET_FROM_CLOUD_USER_ACCESS_KEYS>"
+      AWS_ACCESS_KEY="${EC2UserAccessKey}"
+      AWS_SECRET_KEY="${EC2UserAccessKey.SecretAccessKey}"
       AWS_REGION="${AWS::Region}"
       
-      # Database Configuration
+      # Database Configuration - READY TO USE
       POSTGRES_HOST="${PostgreSQLDatabase.Endpoint.Address}"
       POSTGRES_PORT="${PostgreSQLDatabase.Endpoint.Port}"
       POSTGRES_DB="${DBName}"
@@ -594,6 +644,34 @@ Outputs:
       # External API (Get from Mistral AI)
       MISTRAL_API_KEY="<YOUR_MISTRAL_API_KEY>"
       
-      # React Environment Variables
+      # React Environment Variables - READY TO USE
       EC2_PUBLIC_IP="${MyEC2Instance.PublicIp}"
       API_BASE_URL="http://${MyEC2Instance.PublicIp}"
+
+  # Deployment Instructions
+  DeploymentInstructions:
+    Description: Step-by-step deployment instructions
+    Value: !Sub |
+      DEPLOYMENT INSTRUCTIONS:
+      
+      1. COPY ENVIRONMENT VARIABLES:
+         Copy the 'EnvironmentVariables' output to your .env file
+      
+      2. ADD MISTRAL API KEY:
+         Get your API key from https://console.mistral.ai/
+         Replace <YOUR_MISTRAL_API_KEY> in the .env file
+      
+      3. CONNECT TO EC2:
+         ssh -i "your-key.pem" ec2-user@${MyEC2Instance.PublicIp}
+      
+      4. DEPLOY APPLICATIONS:
+         Upload your code and run: docker-compose up -d
+      
+      5. ACCESS APPLICATIONS:
+         React Frontend: http://${MyEC2Instance.PublicIp}:3000
+         RAG-DocuMind: http://${MyEC2Instance.PublicIp}:8501
+         Prompt Engineering: http://${MyEC2Instance.PublicIp}:8502
+         NIST AI RMF: http://${MyEC2Instance.PublicIp}:8503
+         Multi-Agent CrewAI: http://${MyEC2Instance.PublicIp}:8504
+         Conversational AI: http://${MyEC2Instance.PublicIp}:8000
+         Interpretable AI: http://${MyEC2Instance.PublicIp}:8506
