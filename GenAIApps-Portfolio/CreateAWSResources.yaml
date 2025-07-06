@@ -260,8 +260,8 @@ Resources:
               - s3:ListMultipartUploadParts
               - s3:AbortMultipartUpload
             Resource:
-              - !Sub '${MyS3Bucket}/*'
-              - !GetAtt MyS3Bucket.Arn
+              - !Sub '${MyS3Bucket.Arn}/*'
+              - !Ref MyS3Bucket.Arn
           - Effect: Allow
             Action:
               - s3:ListAllMyBuckets
@@ -363,7 +363,7 @@ Resources:
                 Action:
                   - s3:PutObject
                   - s3:PutObjectAcl
-                Resource: !Sub '${MyS3Bucket}/*'
+                Resource: !Sub '${MyS3Bucket.Arn}/*'
 
   # Lambda function to create S3 folders
   S3FolderCreationFunction:
